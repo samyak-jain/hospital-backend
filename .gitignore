@@ -102,3 +102,4 @@ ENV/
 
 .idea
 TODO.md
+secrets.py
