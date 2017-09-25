@@ -22,7 +22,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class IndexHandler(BaseHandler):
     def get(self):
-        if self.get_current_user():
+        if self.current_user:
             self.render("portal.html")
 
 
@@ -33,14 +33,16 @@ class AuthHandler(BaseHandler):
         password = self.get_argument("pwd")
         portal = self.get_argument("portal")
 
-        hash = pbkdf2_sha256.hash(username)
-        db = self.settings["db"]
+        db_client = self.settings["db_client"]
+        database = db_client["auth"]
 
-        find = yield db.find_one({"user": username, "pass": hash, "portal": portal})
+        find = yield database.find_one({"user": username})
 
-        if not find:
+        cred = pbkdf2_sha256.verify(password, find["pass"])
+
+        if not cred:
             self.write(json.dumps({
-                "status_code": 405,
+                "status_code": 400,
                 "message": "Invalid Credentials"
             }))
             return
@@ -55,7 +57,50 @@ class AuthHandler(BaseHandler):
 
 
 class SignUpHandler(BaseHandler):
-    pass
+    @tornado.gen.coroutine
+    def post(self, *args, **kwargs):
+        username = self.get_argument("user")
+        password = self.get_argument("pwd")
+        user_details = {
+            "user": username,
+            "name": self.get_argument("name"),
+            "dob": self.get_argument("dob"),
+            "email": self.get_argument("email"),
+            "address": self.get_argument("ad"),
+            "portal": self.get_argument("portal"),
+            "hospital": self.get_argument("hos")
+        }
+
+        db_client = self.settings["db_client"]
+        database_auth = db_client["auth"]
+        database_details = db_client["user_details"]
+
+        find_user = yield database_auth.find_one({"user": username})
+        find_email = yield database_details.find_one({"email": user_details["email"]})
+
+        if find_user:
+            self.write(json.dumps({
+                "status_code": 400,
+                "message": "Username exists"
+            }))
+        elif find_email:
+            self.write(json.dumps({
+                "status_code": 400,
+                "message": "Email already under use"
+            }))
+
+        hash_pass = pbkdf2_sha256.hash(password)
+
+        database_auth.insert_one({"user": username, "pass": hash_pass})
+        database_details.insert_one(user_details)
+
+        self.set_secure_cookie("user", username)
+        self.set_cookie("portal", user_details["portal"])
+
+        self.write(json.dumps({
+            "status_code": 200,
+            "message": None
+        }))
 
 
 class PatientHandler(BaseHandler):
@@ -65,16 +110,16 @@ class PatientHandler(BaseHandler):
         pass
 
 
+
 if __name__ == "__main__":
     tornado.options.parse_command_line()
     client = motor_tornado.MotorClient("mongodb://" + dbuser + ":" + dbpass + "@ds147974.mlab.com:47974/hospital-backend")
-    db = client["auth"]
     settings = {
         "default_handler_args": dict(status_code=404),
         "debug": True,
         "cookie_secret": cookie_secret,
         "login_url": "/login",
-        "db": db
+        "db_client": client
     }
     app = tornado.web.Application(
         handlers=[
