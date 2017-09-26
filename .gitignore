@@ -103,3 +103,4 @@ ENV/
 .idea
 TODO.md
 secrets.py
+.DS_Store

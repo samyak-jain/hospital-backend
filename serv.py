@@ -1,5 +1,6 @@
 import json
 import os
+import sqlite3
 import tornado.auth
 import tornado.gen
 import tornado.httpserver
@@ -108,7 +109,6 @@ class PatientHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
         pass
-
 
 
 if __name__ == "__main__":
