@@ -68,7 +68,7 @@ class doctor(users):
 
     @staticmethod
     @coroutine
-    def get_doc_list(cls, db, cond):
+    def get_doc_list(db, cond):
         resp = yield db.doctor.find({"type": {"$in": cond}})
         listOfDoc = []
         for ele in resp:
