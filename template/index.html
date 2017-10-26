@@ -16,9 +16,9 @@
     	  <div class="modal-dialog">
 				<div class="loginmodal-container">
 					<h1>Log In</h1><br>
-				  <form>
-					<input type="text" name="user" placeholder="Mobile Number / Email ID">
-					<input type="password" name="pass" placeholder="Password">
+				  <form method="post">
+					<input type="text" name="user" placeholder="Mobile Number / Email ID" required>
+					<input type="password" name="pass" placeholder="Password" required>
 					<input type="checkbox" name="remember">  Remember me</br>
 					<input type="submit" name="login" class="login loginmodal-submit" value="Login">
 				  </form>
@@ -31,19 +31,19 @@
 		  </div>
 
 
-		  <div class="modal fade" id="SignupModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
-    	  <div class="modal-dialog">
-				<div class="loginmodal-container">
-					<h1>Sign Up</h1><br>
-				  <form>
-					<input type="text" name="fullname" placeholder="Full Name">
-					<input type="text" name="mobilenum" placeholder="Mobile Number">
-					<input type="password" name="pass" placeholder="Password">
-					<input type="submit" name="Signup" class="login loginmodal-submit" value="Sign Up">
-				  </form>
-				</div>
-			</div>
-		  </div>
+		  <!--<div class="modal fade" id="SignupModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">-->
+    	  <!--<div class="modal-dialog">-->
+				<!--<div class="loginmodal-container">-->
+					<!--<h1>Sign Up</h1><br>-->
+				  <!--<form>-->
+					<!--<input type="text" name="fullname" placeholder="Full Name">-->
+					<!--<input type="text" name="mobilenum" placeholder="Mobile Number">-->
+					<!--<input type="password" name="pass" placeholder="Password">-->
+					<!--<input type="submit" name="Signup" class="login loginmodal-submit" value="Sign Up">-->
+				  <!--</form>-->
+				<!--</div>-->
+			<!--</div>-->
+		  <!--</div>-->
 
   	<!--banner-->
 	<section id="banner" class="banner">
@@ -66,9 +66,18 @@
 				        <li class=""><a href="#service">Services</a></li>
 				        <li class=""><a href="#about">About</a></li>
 				        <li class=""><a href="#contact">Contact</a></li>
+					  	{% set flag = tarp %}
+			  			{% if flag == None %}
 				        <li><a data-toggle="modal" data-target="#LoginModal">Log In</a></li>
-				        <li><a data-toggle="modal" data-target="#SignupModal">Sign Up</a></li>
+						  <li><a href="/Signup">Sign Up</a></li>
+					  	{% elif flag == 1%}
+						  <li><a href="/patient">{{name}}</a></li>
+					  	{% elif flag == 0 %}
+						  <li><a href="/doctor">Dr.{{name}}</a></li>
+					  {% end %}
+				        <!--<li><a data-toggle="modal" data-target="#SignupModal">Sign Up</a></li>-->
 				        <li class=""><a href="#listing">Get Listed For Free</a></li>
+
 				      </ul>
 				    </div>
 				</div>
@@ -293,7 +302,7 @@
 			    </div>
 				<div class="col-md-8 col-sm-8 marb20">
 					<div class="contact-info">
-							<h3 class="cnt-ttl">Having Any Query! Or Book an appointment</h3>
+							<h3 class="cnt-ttl">Book an appointment</h3>
 							<div class="space"></div>
                             <div id="sendmessage">Your message has been sent. Thank you!</div>
                             <div id="errormessage"></div>
@@ -316,7 +325,7 @@
                                 </div>
                                 
 								<div class="form-action">
-									<button type="submit" class="btn btn-form">Send Message</button>
+									<button type="submit" class="btn btn-form">Send message</button>
 								</div>
 							</form>
 					</div>

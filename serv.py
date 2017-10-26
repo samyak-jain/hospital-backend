@@ -1,133 +1,277 @@
 import json
 import os
-import sqlite3
 import tornado.auth
-import tornado.gen
+from tornado.gen import coroutine
 import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
-
-from motor import motor_tornado
+import traceback
 from passlib.hash import pbkdf2_sha256
-from secrets import dbuser, dbpass, cookie_secret
+# from secrets import dbuser, dbpass, cookie_secret
 from tornado.options import define, options
+from motor import motor_tornado
+define("port", default=7000, help="runs on the given port", type=int)
 
-define("port", default=8000, help="runs on the given port", type=int)
+
+class users(object):
+
+    def __init__(self, email, user, name):
+        self.email = email
+        self.user = user
+        self.name = name
+
+    @staticmethod
+    @coroutine
+    def login(db, name, password):
+        hash = yield db.auth.find_one({"user": name})
+        if not hash:
+            return True
+        if  pbkdf2_sha256.verify(password, hash["pass"]):
+            return True
+        else:
+            return False
+
+    @staticmethod
+    @coroutine
+    def find_portal(username, db):
+        resp = yield db.auth.find_one({"user": username})
+        return resp['portal']
+
+
+class patient(users):
+    @staticmethod
+    @coroutine
+    def make_appointment(user, db, ap_details):
+        resp = yield db.patient.find_one({'user': user})
+        if not resp['ap_details']:
+            Modi = client.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
+            if Modi['updatedExisting']:
+                return True
+        return False
+
+    @classmethod
+    @coroutine
+    def get_details(cls, username, db):
+        resp = yield db.patient.find_one({'user': username})
+        return cls(resp['email'], username, resp['fname'])
+
+
+class doctor(users):
+
+    @staticmethod
+    @coroutine
+    def diagnose(db, username):
+        resp = yield db.doctor.find_one({"user": username})
+        patient_resp = db.patient.find({'ap_details.type': {'$in': resp['type']}})
+        return patient_resp
+
+    @classmethod
+    @coroutine
+    def get_details(cls, user, db):
+        resp = yield db.doctor.find_one({'user': user})
+        return cls(email=resp['email'], username=user, fname=resp['fname'])
+
+
+class MyAppException(tornado.web.HTTPError):
+    pass
 
 
 class BaseHandler(tornado.web.RequestHandler):
+
     def get_current_user(self):
         self.get_secure_cookie("user")
 
+    def db(self):
+        Client = self.settings['db_client']
+        db = Client.tornado
+        return db
 
-class IndexHandler(BaseHandler):
-    def get(self):
-        if self.current_user:
-            self.render("portal.html")
+    def write_error(self, status_code, **kwargs):
+        # self.set_header('Content-Type', 'application/json')
+        if self.settings.get("serve_traceback") and "exc_info" in kwargs:
+            # in debug mode, try to send a traceback
+            lines = []
+            for line in traceback.format_exception(*kwargs["exc_info"]):
+                lines.append(line)
+            self.render("error.html", d=json.dumps({
+                    'error': {
+                        'code': status_code,
+                        'message': self._reason,
+                        'traceback': lines,
+                    }
+                }), page=None)
+        else:
+            self.render("error.html", d=json.dumps({
+                'error': {
+                    'code': status_code,
+                    'message': self._reason,
+                    }
+                }), page=None)
 
 
 class AuthHandler(BaseHandler):
-    @tornado.gen.coroutine
-    def post(self, *args, **kwargs):
+    @coroutine
+    def get(self):
+        if bool(self.get_secure_cookie("user")):
+            portal = self.get_cookie("portal")
+            username = self.get_cookie("name")
+            if portal == "1":
+                patio = yield patient.get_details(username, self.db())
+                self.render("index.html", tarp=1, name=patio.name)
+            elif portal =="0":
+                patio = yield doctor.get_details(username, self.db())
+                self.render("index.html", tarp=0, name=patio.name)
+        else:
+            self.render("index.html", tarp=None, name="Amrut")
+
+    @coroutine
+    def post(self):
         username = self.get_argument("user")
-        password = self.get_argument("pwd")
-        portal = self.get_argument("portal")
-
-        db_client = self.settings["db_client"]
-        database = db_client["auth"]
-
-        find = yield database.find_one({"user": username})
-
-        cred = pbkdf2_sha256.verify(password, find["pass"])
-
-        if not cred:
-            self.write(json.dumps({
-                "status_code": 400,
-                "message": "Invalid Credentials"
-            }))
+        password = self.get_argument("pass")
+        db_client = self.db()
+        portal = users.find_portal(username, db_client)
+        if portal == "1":
+            flag = users.login(db_client, username, password)
+            if not flag:
+                self.render("error.html",d=json.dumps({
+                    "error": {
+                        "code": "50",
+                        "message": "Credentials invalid or client failure.  "
+                    }
+                }))
+                return
+        elif portal == "0":
+            flag = users.login(db_client, username, portal, password)
+            if not flag:
+                self.render("error.html",d=json.dumps({
+                    "error": {
+                        "code": "100",
+                        "message": "Credentials invalid or client failure.  "
+                    }
+                }))
+                return
+        else:
             return
-
-        self.set_secure_cookie("user", username)
         self.set_cookie("portal", portal)
-
-        self.write(json.dumps({
-            "status_code": 200,
-            "message": None
-        }))
+        self.set_cookie("name", username)
+        self.set_secure_cookie("user", username)
+        self.redirect("/")
 
 
 class SignUpHandler(BaseHandler):
-    @tornado.gen.coroutine
+    def get(self):
+        self.render("signup.html")
+
+    @coroutine
     def post(self, *args, **kwargs):
         username = self.get_argument("user")
-        password = self.get_argument("pwd")
+        password = self.get_argument("pass")
         user_details = {
             "user": username,
-            "name": self.get_argument("name"),
-            "dob": self.get_argument("dob"),
+            "fname": self.get_argument("fname"),
+            "lname": self.get_argument("lname"),
             "email": self.get_argument("email"),
-            "address": self.get_argument("ad"),
+            "address": self.get_argument("address"),
             "portal": self.get_argument("portal"),
-            "hospital": self.get_argument("hos")
         }
 
-        db_client = self.settings["db_client"]
+        db_client = self.db()
         database_auth = db_client["auth"]
-        database_details = db_client["user_details"]
+        if user_details['portal'] == "1":
+            database_details = db_client["patient"]
+            user_details['ap_details'] = dict()
+        elif user_details['portal'] == "0":
+            database_details = db_client["doctor"]
+            user_details['type'] = list()
 
         find_user = yield database_auth.find_one({"user": username})
         find_email = yield database_details.find_one({"email": user_details["email"]})
 
         if find_user:
-            self.write(json.dumps({
-                "status_code": 400,
-                "message": "Username exists"
-            }))
+            self.render("error.html", d=json.dumps({
+                "error": {
+                    "code": 400,
+                    "message": "Username exists"
+                }}))
+            return
         elif find_email:
-            self.write(json.dumps({
-                "status_code": 400,
-                "message": "Email already under use"
-            }))
-
+            self.render("error.html", d=json.dumps({
+                "error": {
+                    "code": 400,
+                    "message": "Email already under use"
+            }}))
+            return
         hash_pass = pbkdf2_sha256.hash(password)
 
-        database_auth.insert_one({"user": username, "pass": hash_pass})
+        database_auth.insert_one({"user": username, "pass": hash_pass, "portal": user_details['portal']})
         database_details.insert_one(user_details)
 
+        self.set_cookie("name",username)
         self.set_secure_cookie("user", username)
-        self.set_cookie("portal", user_details["portal"])
-
-        self.write(json.dumps({
-            "status_code": 200,
-            "message": None
-        }))
+        self.set_cookie("portal", user_details['portal'])
+        self.redirect("portal.html")
 
 
 class PatientHandler(BaseHandler):
-    @tornado.gen.coroutine
     @tornado.web.authenticated
     def get(self):
+        portal = self.get_cookie("portal")
+        username = self.get_cookie("name")
+        self.render("patient.html" ,tarp="1",name=username)
+
+
+class DoctorHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        portal = self.get_cookie("portal")
+        username = self.get_cookie("name")
+        self.render("patient.html", tarp="0", name=username)
         pass
+
+
+class my404handler(BaseHandler):
+    def get(self):
+        self.render("error.html", d=json.dumps({
+            'error': {
+                'code': 404,
+                'message': 'Page not found.'
+            }
+        }))
+
+
+class LogoutHandler(BaseHandler):
+    def get(self):
+        if bool(self.get_secure_cookie('user')):
+            self.clear_cookie('user')
+            self.clear_cookie('portal')
+            self.clear_cookie('username')
+        else:
+            self.write("COOKIES ARENT GETTING SET.")
+            return
+        self.redirect('/')
 
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()
-    client = motor_tornado.MotorClient("mongodb://" + dbuser + ":" + dbpass + "@ds147974.mlab.com:47974/hospital-backend")
+    client = motor_tornado.MotorClient("mongodb://"+os.environ['dbuser']+":"+os.environ['dbpass']+"@ds117605.mlab.com:17605/tornado")
     settings = {
-        "default_handler_args": dict(status_code=404),
+        "default_handler_class": my404handler,
         "debug": True,
-        "cookie_secret": cookie_secret,
+        "cookie_secret": os.environ['cookie_secret'],
         "login_url": "/login",
         "db_client": client
     }
     app = tornado.web.Application(
         handlers=[
-            (r"/", IndexHandler),
+            (r"/", AuthHandler),
             (r"/login", AuthHandler),
-            (r"/signup", SignUpHandler),
-            (r"/patient", PatientHandler)
-        ], **settings
+            (r"/Signup", SignUpHandler),
+            (r"/patient", PatientHandler),
+            (r"/logout", LogoutHandler)
+        ], **settings,
+        template_path=os.path.join(os.path.dirname(__file__), "template"),
+        static_path=os.path.join(os.path.dirname(__file__), "static"),
     )
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(os.environ.get("PORT",options.port))
