@@ -38,7 +38,7 @@ class patient(users):
     @coroutine
     def make_appointment(user, db, ap_details):
         resp = yield db.patient.find_one({'user': user})
-        if not resp['ap_details']:
+        if resp['ap_details'] is None:
             Modi = client.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
             if Modi['updatedExisting']:
                 return True
@@ -68,11 +68,11 @@ class doctor(users):
 
     @classmethod
     @coroutine
-    def get_doc_list(cls, db):
-        resp = yield db.doctor.find({})
+    def get_doc_list(cls, db, cond):
+        resp = yield db.doctor.find({"type": {"$in": cond}})
         listOfDoc = []
         for ele in resp:
-            listOfDoc.append(cls(email=ele['email'], username=ele['user'], fname=ele['fname']))
+            listOfDoc.append(cls(email=ele['email'], user=ele['user'], name=ele['fname']))
 
         return listOfDoc
 
