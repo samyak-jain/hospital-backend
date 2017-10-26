@@ -32,12 +32,6 @@ class users(object):
         else:
             return False
 
-    @staticmethod
-    @coroutine
-    def find_portal(username, db):
-        resp = yield db.auth.find_one({"user": username})
-        return resp['portal']
-
 
 class patient(users):
     @staticmethod
@@ -70,7 +64,7 @@ class doctor(users):
     @coroutine
     def get_details(cls, user, db):
         resp = yield db.doctor.find_one({'user': user})
-        return cls(email=resp['email'], username=user, fname=resp['fname'])
+        return cls(email=resp['email'], user=user, name=resp['fname'])
 
 
 class MyAppException(tornado.web.HTTPError):
@@ -130,33 +124,21 @@ class AuthHandler(BaseHandler):
         username = self.get_argument("user")
         password = self.get_argument("pass")
         db_client = self.db()
-        portal = users.find_portal(username, db_client)
-        if portal == "1":
-            flag = users.login(db_client, username, password)
-            if not flag:
-                self.render("error.html",d=json.dumps({
-                    "error": {
-                        "code": "50",
-                        "message": "Credentials invalid or client failure.  "
-                    }
-                }))
-                return
-        elif portal == "0":
-            flag = users.login(db_client, username, portal, password)
-            if not flag:
-                self.render("error.html",d=json.dumps({
-                    "error": {
-                        "code": "100",
-                        "message": "Credentials invalid or client failure.  "
-                    }
-                }))
-                return
-        else:
+        flag = users.login(db_client, username, password)
+        if not flag:
+            self.render("error.html",d=json.dumps({
+                "error": {
+                    "code": "50",
+                    "message": "Credentials invalid or client failure.  "
+                }
+            }))
             return
+        response = yield db_client.auth.find_one({'user': username})
+        portal = response['portal']
         self.set_cookie("portal", portal)
         self.set_cookie("name", username)
         self.set_secure_cookie("user", username)
-        self.redirect("/")
+        self.redirect("/user")
 
 
 class SignUpHandler(BaseHandler):
@@ -214,20 +196,11 @@ class SignUpHandler(BaseHandler):
 
 
 class PatientHandler(BaseHandler):
-    @tornado.web.authenticated
     def get(self):
-        portal = self.get_cookie("portal")
-        username = self.get_cookie("name")
-        self.render("patient.html" ,tarp="1",name=username)
-
-
-class DoctorHandler(BaseHandler):
-    @tornado.web.authenticated
-    def get(self):
-        portal = self.get_cookie("portal")
-        username = self.get_cookie("name")
-        self.render("patient.html", tarp="0", name=username)
-        pass
+        if self.get_secure_cookie("user"):
+            portal = self.get_cookie("portal")
+            username = self.get_cookie("name")
+            self.render("patient.html", tarp=portal, name=username)
 
 
 class my404handler(BaseHandler):
@@ -267,7 +240,7 @@ if __name__ == "__main__":
             (r"/", AuthHandler),
             (r"/login", AuthHandler),
             (r"/Signup", SignUpHandler),
-            (r"/patient", PatientHandler),
+            (r"/user", PatientHandler),
             (r"/logout", LogoutHandler)
         ], **settings,
         template_path=os.path.join(os.path.dirname(__file__), "template"),
