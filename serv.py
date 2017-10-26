@@ -8,10 +8,17 @@ import tornado.options
 import tornado.web
 import traceback
 from passlib.hash import pbkdf2_sha256
-# from secrets import dbuser, dbpass, cookie_secret
 from tornado.options import define, options
 from motor import motor_tornado
 define("port", default=7000, help="runs on the given port", type=int)
+from bson import ObjectId
+
+
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
 
 
 class users(object):
