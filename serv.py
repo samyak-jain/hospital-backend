@@ -66,13 +66,13 @@ class doctor(users):
         resp = yield db.doctor.find_one({'user': user})
         return cls(email=resp['email'], user=user, name=resp['fname'])
 
-    @classmethod
+    @staticmethod
     @coroutine
     def get_doc_list(cls, db, cond):
         resp = yield db.doctor.find({"type": {"$in": cond}})
         listOfDoc = []
         for ele in resp:
-            listOfDoc.append(cls(email=ele['email'], user=ele['user'], name=ele['fname']))
+            listOfDoc.append(dict(email=ele['email'], user=ele['user'], name=ele['fname']))
 
         return listOfDoc
 
