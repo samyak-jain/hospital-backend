@@ -1,17 +1,23 @@
 import json
 import os
-import tornado.auth
-from tornado.gen import coroutine
-import tornado.httpserver
-import tornado.ioloop
-import tornado.options
-import tornado.web
 import traceback
-from passlib.hash import pbkdf2_sha256
-# from secrets import dbuser, dbpass, cookie_secret
-from tornado.options import define, options
+
+import tornado.web
 from motor import motor_tornado
+from passlib.hash import pbkdf2_sha256
+from tornado.gen import coroutine
+from tornado.options import define, options
+
 define("port", default=7000, help="runs on the given port", type=int)
+from bson import ObjectId
+import Azure
+
+
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
 
 
 class users(object):
@@ -236,6 +242,15 @@ class LogoutHandler(BaseHandler):
         self.redirect('/')
 
 
+class PortalHandler(BaseHandler):
+    def get(self):
+        if self.get_secure_cookie("user"):
+            dat = Azure.get_hospitalList()
+            self.render("portal.html", hospital=dat)
+        else:
+            self.redirect("/")
+
+
 if __name__ == "__main__":
     tornado.options.parse_command_line()
     client = motor_tornado.MotorClient("mongodb://"+os.environ['dbuser']+":"+os.environ['dbpass']+"@ds117605.mlab.com:17605/tornado")
@@ -252,7 +267,8 @@ if __name__ == "__main__":
             (r"/login", AuthHandler),
             (r"/Signup", SignUpHandler),
             (r"/user", PatientHandler),
-            (r"/logout", LogoutHandler)
+            (r"/logout", LogoutHandler),
+            (r"/portal", PortalHandler)
         ], **settings,
         template_path=os.path.join(os.path.dirname(__file__), "template"),
         static_path=os.path.join(os.path.dirname(__file__), "static"),
