@@ -66,6 +66,16 @@ class doctor(users):
         resp = yield db.doctor.find_one({'user': user})
         return cls(email=resp['email'], user=user, name=resp['fname'])
 
+    @classmethod
+    @coroutine
+    def get_doc_list(cls, db):
+        resp = yield db.doctor.find({})
+        listOfDoc = []
+        for ele in resp:
+            listOfDoc.append(cls(email=ele['email'], username=ele['user'], fname=ele['fname']))
+
+        return listOfDoc
+
 
 class MyAppException(tornado.web.HTTPError):
     pass
@@ -160,6 +170,7 @@ class SignUpHandler(BaseHandler):
 
         db_client = self.db()
         database_auth = db_client["auth"]
+        database_details = None
         if user_details['portal'] == "1":
             database_details = db_client["patient"]
             user_details['ap_details'] = dict()
