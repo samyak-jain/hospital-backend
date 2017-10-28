@@ -223,9 +223,12 @@ class PatientHandler(BaseHandler):
             portal = self.get_cookie("portal")
             if portal == "1":
                 username = self.get_cookie("name")
-                self.render("patient.html", Name=username)
+                details = yield patient.get_details(username)
+                self.render("patient.html", Name=username, )
+
             else:
                 self.redirect("/")
+
 
 
 class my404handler(BaseHandler):
@@ -287,7 +290,8 @@ if __name__ == "__main__":
             (r"/patient", PatientHandler),
             (r"/logout", LogoutHandler),
             (r"/portal", PortalHandler),
-            (r"/path", PathHandler)
+            (r"/path", PathHandler),
+            (r"/user", PatientHandler)
         ], **settings,
         template_path=os.path.join(os.path.dirname(__file__), "template"),
         static_path=os.path.join(os.path.dirname(__file__), "static"),

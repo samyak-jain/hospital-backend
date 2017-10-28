@@ -60,74 +60,82 @@
 		 		<br>
 			 <a class="btn" id="detail" href="">Your details</a>
 	 </div>
-		<div class="container col-md-10 right-bar appointment">
+		<div class="container col-md-10 right-bar">
+            <div class="appointment">
 			<div class="card card-register mx-auto mt-5 bg-dark ">
       <div class="card-header">Register an Account</div>
       <div class="card-body">
         <form class="was-validated" id="regis" method="post">
           <div class="form-group">
             <div class="form-row">
-              <div class="col-md-6">
+              <div class="col-md-12">
                 <label for="exampleInputName">First name</label>
                 <input name="fname" class="form-control" id="exampleInputName" type="text" aria-describedby="nameHelp" placeholder="Enter first name" required>
-              </div>
-              <div class="col-md-6">
-                <label for="exampleInputLastName">Last name</label>
-                <input name="lname" class="form-control" id="exampleInputLastName" type="text" aria-describedby="nameHelp" placeholder="Enter last name" required>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-              <div class="form-row">
-                  <div class="col-md-6">
-                    <label for="exampleInputEmail1">Email address</label>
-                    <input name="email" class="form-control" id="exampleInputEmail1" type="email" aria-describedby="emailHelp" placeholder="Enter email" required>
-                  </div>
-                  <div class="col-md-6">
-                    <label for="exampleInputEmail1">Username</label>
-                    <input name="user" class="form-control" id="username" type="text" placeholder="Enter your Username" required>
-                  </div>
-          </div>
-          </div>
-          <div class="form-group">
-            <div class="form-row">
-              <div class="col-md-6">
-                <label for="exampleInputPassword1">Password</label>
-                <input name="pass" class="form-control" id="exampleInputPassword1" type="password" placeholder="Password" required>
-              </div>
-              <div class="col-md-6">
-                <label for="exampleConfirmPassword">Confirm password</label>
-                <input name="cpass" class="form-control" id="exampleConfirmPassword" type="password" placeholder="Confirm password" required>
               </div>
             </div>
           </div>
             <div class="form-group">
             <div class="form-row">
               <div class="col-md-12">
-                <label for="exampleInputPassword1">Address</label>
-                  <textarea name="address" class="form-control" id="TA" rows="3" required></textarea>
+                <label for="symptoms">First </label>
+                  <textarea name="fname" class="form-control" id="symptoms" type="text" aria-describedby="nameHelp" placeholder="Enter first name" required></textarea>
+              </div>
+            </div>
+          </div>
+        </form>
+        </div>
+	  </div>
+ 	</div>
+        <div class="hide" id="detailss">
+         <div class="card card-register mx-auto mt-5 bg-dark ">
+      <div class="card-header">Your details</div>
+      <div class="card-body">
+        <form class="was-validated" id="regis" method="post">
+          <div class="form-group">
+            <div class="form-row">
+              <div class="col-md-6">
+                <span>First name</span>:{{resp['fname']}}
               </div>
             </div>
           </div>
             <div class="form-group">
             <div class="form-row">
-            <div class="col-md-6">
-                <label for="doc">patient </label>
-                <input name="portal" class="form-control" type="radio" value="1" id="doc" required>
-            </div>
-                <div class="col-md-6">
-                <label for="pat">doctor </label>
-                <input name="portal" class="form-control" type="radio" value="0" id="pat" required>
-                </div>
+              <div class="col-md-6">
+                <span>Last name</span>:{{resp['lname']}}
               </div>
             </div>
-		</form>
+          </div>
+            <div class="form-group">
+            <div class="form-row">
+              <div class="col-md-6">
+                <span>email</span>:{{resp['email']}}
+              </div>
+            </div>
+          </div>
+            <div class="form-group">
+            <div class="form-row">
+              <div class="col-md-6">
+                <span>Address</span>:{{resp['address']}}
+              </div>
+            </div>
+          </div>
+            <div class="form-group">
+            <div class="form-row">
+              <div class="col-md-6">
+                  {% if resp['ap_details'] is not none %}
+                  <span><h5>made appointments</h5></span>
+                  <br>Symptomps: head ache, vomiting.
+                  <br>Message: I ate this really bad thing and i am sick, my stomach pain
+                  <br>Doctor appointed: Dr. James
+                  {%end%}
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
 	  </div>
- 	</div>
- </div>
-	 <div class="hide" id="details">
-	 <span>HELLO</span>
 	 </div>
+ </div>
  </div>
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
@@ -180,18 +188,25 @@
     }
   });
 });
-	  $("#appoint").onClick = function(){
-	      if(!$("#appoint").css('visibility') === 'hidden') {
-              this.show();
+	  $(function () {
+          $("#appoint").click(function(){
+              console.log('appoint clicked !');
+//	      if(!$(".appointment").css('visibility') === 'hidden') {
+              $(".appointement").show();
 			  $("#details").hide();
-          }
-	  };
-	 $("#detail").onClick = function(){
-	      if(!this.css('visibility') === 'hidden') {
-              this.toggleclass("hide");
-			  $("#appointment").hide();
-          }
-	  };
+//          }
+	  });
+	 $("#detail").click(function(e){
+	     e.preventDefault();
+	     console.log('detail clicked !');
+	      $(".appointment").hide();
+	      $("#detailss").show();
+
+//	      if(!$("#details").css('visibility') === 'hidden') {
+//
+//          }});
+        });
+	  });
  </script>
 </body>
 
