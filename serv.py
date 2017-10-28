@@ -217,8 +217,11 @@ class PatientHandler(BaseHandler):
     def get(self):
         if self.get_secure_cookie("user"):
             portal = self.get_cookie("portal")
-            username = self.get_cookie("name")
-            self.render("patient.html", tarp=portal, name=username)
+            if portal == "1":
+                username = self.get_cookie("name")
+                self.render("patient.html", Name=username)
+            else:
+                self.redirect("/")
 
 
 class my404handler(BaseHandler):
@@ -252,6 +255,16 @@ class PortalHandler(BaseHandler):
             self.redirect("/")
 
 
+class PathHandler(BaseHandler):
+    def get(self):
+        if self.get_secure_cookie("user"):
+            portal = self.get_cookie("portal")
+            if portal == "1":
+                self.redirect("/user")
+            else:
+                self.redirect("/doc")
+
+
 if __name__ == "__main__":
     tornado.options.parse_command_line()
     client = motor_tornado.MotorClient("mongodb://"+os.environ['dbuser']+":"+os.environ['dbpass']+"@ds117605.mlab.com:17605/tornado")
@@ -267,9 +280,10 @@ if __name__ == "__main__":
             (r"/", AuthHandler),
             (r"/login", AuthHandler),
             (r"/Signup", SignUpHandler),
-            (r"/user", PatientHandler),
+            (r"/patient", PatientHandler),
             (r"/logout", LogoutHandler),
-            (r"/portal", PortalHandler)
+            (r"/portal", PortalHandler),
+            (r"/path", PathHandler)
         ], **settings,
         template_path=os.path.join(os.path.dirname(__file__), "template"),
         static_path=os.path.join(os.path.dirname(__file__), "static"),

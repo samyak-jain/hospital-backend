@@ -1,168 +1,198 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>MediCent</title>
+<html lang="en">
 
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans|Raleway|Candal">
-    <link rel="stylesheet" type="text/css" href="../static/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="../static/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
-  </head>
-  <body id="myPage" data-spy="scroll" data-target=".navbar">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>  </title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <link rel="stylesheet" href="../static/css/signup.css">
+  	<link rel="stylesheet" href="../static/css/sb-admin.css">
+	<style type="text/css">
+		.left-bar{
+			height: 43.5em;
+			width: 60%;
+			background-color: #1d2124;
+		}
+		a{
+			color: white;
+		}
+		.hide{
+			display: none;
+		}
+	</style>
+</head>
 
-  		<div class="modal fade" id="LoginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
-    	  <div class="modal-dialog">
-				<div class="loginmodal-container">
-					<h1>Log In</h1><br>
-				  <form method="post">
-					<input type="text" name="user" placeholder="Mobile Number / Email ID" required>
-					<input type="password" name="pass" placeholder="Password" required>
-					<input type="checkbox" name="remember">  Remember me</br>
-				  <label for="patient">patient </label> <input type="radio" name="portal" id="patient" value="1"required>
-				  <label for="doctor">doctor </label> <input type="radio" name="portal" id="doctor" value="0" required>
-					<input type="submit" name="login" class="login loginmodal-submit" value="Login">
-				  </form>
+<body>
+ <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="/">
+          <img src="{{ static_url("images/first-aid.png")}}" id="brand" alt="">
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+         <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/"> About <span class="sr-only">(About)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href=""> {{Name}} <span class="sr-only">(name)</span></a>
+            </li>
+            <!--<li class="nav-item active">-->
+                <!--<a class="nav-link" href="/Signup"> Signup <span class="sr-only">(Signup)</span></a>-->
+            <!--</li>-->
+          </ul>
+          <span class="navbar-text">
+              <a href="https://github.com/Souldiv">GitHub Profile</a>
+          </span>
+      </div>
+ </nav>
+ <div class="row">
+	 <div class="left-bar col-md-2">
+		 		<br>
+			 <a class="btn" id="appoint" href="">Make an appointment</a>
+		 		<br>
+			 <a class="btn" id="logout" href="">Logout</a>
+		 		<br>
+			 <a class="btn" id="detail" href="">Your details</a>
+	 </div>
+		<div class="container col-md-10 right-bar appointment">
+			<div class="card card-register mx-auto mt-5 bg-dark ">
+      <div class="card-header">Register an Account</div>
+      <div class="card-body">
+        <form class="was-validated" id="regis" method="post">
+          <div class="form-group">
+            <div class="form-row">
+              <div class="col-md-6">
+                <label for="exampleInputName">First name</label>
+                <input name="fname" class="form-control" id="exampleInputName" type="text" aria-describedby="nameHelp" placeholder="Enter first name" required>
+              </div>
+              <div class="col-md-6">
+                <label for="exampleInputLastName">Last name</label>
+                <input name="lname" class="form-control" id="exampleInputLastName" type="text" aria-describedby="nameHelp" placeholder="Enter last name" required>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+              <div class="form-row">
+                  <div class="col-md-6">
+                    <label for="exampleInputEmail1">Email address</label>
+                    <input name="email" class="form-control" id="exampleInputEmail1" type="email" aria-describedby="emailHelp" placeholder="Enter email" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="exampleInputEmail1">Username</label>
+                    <input name="user" class="form-control" id="username" type="text" placeholder="Enter your Username" required>
+                  </div>
+          </div>
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <div class="col-md-6">
+                <label for="exampleInputPassword1">Password</label>
+                <input name="pass" class="form-control" id="exampleInputPassword1" type="password" placeholder="Password" required>
+              </div>
+              <div class="col-md-6">
+                <label for="exampleConfirmPassword">Confirm password</label>
+                <input name="cpass" class="form-control" id="exampleConfirmPassword" type="password" placeholder="Confirm password" required>
+              </div>
+            </div>
+          </div>
+            <div class="form-group">
+            <div class="form-row">
+              <div class="col-md-12">
+                <label for="exampleInputPassword1">Address</label>
+                  <textarea name="address" class="form-control" id="TA" rows="3" required></textarea>
+              </div>
+            </div>
+          </div>
+            <div class="form-group">
+            <div class="form-row">
+            <div class="col-md-6">
+                <label for="doc">patient </label>
+                <input name="portal" class="form-control" type="radio" value="1" id="doc" required>
+            </div>
+                <div class="col-md-6">
+                <label for="pat">doctor </label>
+                <input name="portal" class="form-control" type="radio" value="0" id="pat" required>
+                </div>
+              </div>
+            </div>
+		</form>
+	  </div>
+ 	</div>
+ </div>
+	 <div class="hide" id="details">
+	 <span>HELLO</span>
+	 </div>
+ </div>
 
-				  <div class="login-help">
-					<a href="#">Register</a> - <a href="#">Forgot Password</a>
-				  </div>
-				</div>
-			</div>
-		  </div>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+ <script src="https://cdn.jsdelivr.net/jquery.validation/1.15.1/jquery.validate.min.js"></script>
+ <script>
+	  $().ready(function() {
+  // Initialize form validation on the registration form.
+  // It has the name attribute "registration"
+  $("#regis").validate({
+      errorClass: "error",
+    // Specify validation rules
+    rules: {
+      // The key name on the left side is the name attribute
+      // of an input field. Validation rules are defined
+      // on the right side
+      fname: "required",
+      lname: "required",
+      email: {
+        required: true,
+        // Specify that email should be validated
+        // by the built-in "email" rule
+        email: true
+      },
+      pass: {
+        required: true,
+        minlength: 5
+      },
+      cpass:{
+          required: true,
+          equalTo: "#exampleInputPassword1"
+      }
+    },
+    // Specify validation error messages
+    messages: {
+      fname: "Please enter your firstname.",
+      lname: "Please enter your lastname.",
+      pass: {
+        required: "Please provide a password.",
+        minlength: "Your password must be at least 5 characters long."
+      },
+      email: "Please enter a valid email address.",
+      cpass: "Passwords do not match."
+    },
+    // Make sure the form is submitted to the destination defined
+    // in the "action" attribute of the form when valid
+    submitHandler: function(form) {
+      form.submit();
+    }
+  });
+});
+	  $("#appoint").onClick = function(){
+	      if(!$("#appoint").css('visibility') === 'hidden') {
+              this.show();
+			  $("#details").hide();
+          }
+	  };
+	 $("#detail").onClick = function(){
+	      if(!this.css('visibility') === 'hidden') {
+              this.toggleclass("hide");
+			  $("#appointment").hide();
+          }
+	  };
+ </script>
+</body>
 
-
-		  <!--<div class="modal fade" id="SignupModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">-->
-    	  <!--<div class="modal-dialog">-->
-				<!--<div class="loginmodal-container">-->
-					<!--<h1>Sign Up</h1><br>-->
-				  <!--<form>-->
-					<!--<input type="text" name="fullname" placeholder="Full Name">-->
-					<!--<input type="text" name="mobilenum" placeholder="Mobile Number">-->
-					<!--<input type="password" name="pass" placeholder="Password">-->
-					<!--<input type="submit" name="Signup" class="login loginmodal-submit" value="Sign Up">-->
-				  <!--</form>-->
-				<!--</div>-->
-			<!--</div>-->
-		  <!--</div>-->
-
-  	<!--banner-->
-	<section id="banner" class="banner">
-		<div class="bg-color">
-			<nav class="navbar navbar-default navbar-fixed-top">
-			  <div class="container">
-			  	<div class="col-md-12">
-				    <div class="navbar-header">
-				      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-				        <span class="icon-bar"></span>
-				        <span class="icon-bar"></span>
-				        <span class="icon-bar"></span>
-				      </button>
-				      <!--<h1 class="white">MediCent</h1>
-				      <!--<a class="navbar-brand" href="#"><img src="img/logo.png" class="img-responsive" style="width: 140px; margin-top: -16px;"></a>-->
-				    </div>
-				    <div class="collapse navbar-collapse navbar-right" id="myNavbar">
-				      <ul class="nav navbar-nav">
-				        <li class="active"><a href="#banner">Home</a></li>
-				        <li class=""><a href="#service">Services</a></li>
-				        <li class=""><a href="#about">About</a></li>
-				        <li class=""><a href="#contact">Contact</a></li>
-					  	{% set flag = tarp %}
-			  			{% if flag == None %}
-				        <li><a data-toggle="modal" data-target="#LoginModal">Log In</a></li>
-						  <li><a href="/Signup">Sign Up</a></li>
-					  	{% elif flag == 1%}
-						  <li><a href="/patient">{{name}}</a></li>
-					  	{% elif flag == 0 %}
-						  <li><a href="/doctor">Dr.{{name}}</a></li>
-					  {% end %}
-				        <!--<li><a data-toggle="modal" data-target="#SignupModal">Sign Up</a></li>-->
-				        <li class=""><a href="#listing">Get Listed For Free</a></li>
-
-				      </ul>
-				    </div>
-				</div>
-			  </div>
-			</nav>
-			<!--<div class="container">-->
-				<!--<div class="row">-->
-					<!--<div class="banner-info">-->
-						<!--<div class="banner-logo text-center">-->
-							<!--&lt;!&ndash;<img src="img/logo.png" class="img-responsive">&ndash;&gt;-->
-							<!--<h1 class="white">MediCent</h1>-->
-						<!--</div>-->
-						<!--<div class="banner-text text-center">-->
-							<!--<h1 class="white">Healthcare at your desk!!</h1>-->
-							<!--<h3>Instant appointment with the best doctors. Guaranteed.</h3>-->
-							<!--<a href="#contact" class="btn btn-appoint">Make an Appointment.</a>-->
-						<!--</div>-->
-						<!--<div class="overlay-detail text-center">-->
-			               <!--<a href="#service"><i class="fa fa-angle-down"></i></a>-->
-			             <!--</div>		-->
-					<!--</div>-->
-				<!--</div>-->
-			<!--</div>-->
-		<!--</div>-->
-	<!--</section>-->
-	<footer id="footer">
-		<div class="top-footer">
-			<div class="container">
-				<div class="row">
-					<div class="col-md-4 col-sm-4 marb20">
-							<div class="ftr-tle">
-								<h4 class="white no-padding">About Us</h4>
-							</div>
-							<div class="info-sec">
-								<p>MediCent connects people with everything they need to take good care of themselves and their family - assessing health issues, finding the right doctor, booking diagnostic tests, obtaining medicines, storing health records or learning new ways to live healthier.</p>
-							</div>
-					</div>
-					<div class="col-md-4 col-sm-4 marb20">
-						<div class="ftr-tle">
-							<h4 class="white no-padding">Quick Links</h4>
-						</div>
-						<div class="info-sec">
-							<ul class="quick-info">
-								<li><a href="index.html"><i class="fa fa-circle"></i>Home</a></li>
-								<li><a href="#service"><i class="fa fa-circle"></i>Service</a></li>
-								<li><a href="#contact"><i class="fa fa-circle"></i>Appointment</a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="col-md-4 col-sm-4 marb20">
-						<div class="ftr-tle">
-							<h4 class="white no-padding">Follow us</h4>
-						</div>
-						<div class="info-sec">
-							<ul class="social-icon">
-								<li class="bglight-blue"><i class="fa fa-facebook"></i></li>
-								<li class="bgred"><i class="fa fa-google-plus"></i></li>
-								<li class="bgdark-blue"><i class="fa fa-linkedin"></i></li>
-								<li class="bglight-blue"><i class="fa fa-twitter"></i></li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="footer-line">
-			<div class="container">
-				<div class="row">
-					<div class="col-md-12 text-center">
-                        <div class="credits">
-
-                        </div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</footer>
-	<!--/ footer-->
-
-    <script src="../static/js/jquery.min.js"></script>
-    <script src="../static/js/jquery.easing.min.js"></script>
-    <script src="../static/js/bootstrap.min.js"></script>
-    <script src="../static/js/custom.js"></script>
-
-  </body>
 </html>
