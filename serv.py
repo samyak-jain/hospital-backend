@@ -218,16 +218,31 @@ class SignUpHandler(BaseHandler):
 
 
 class PatientHandler(BaseHandler):
+    @coroutine
     def get(self):
         if self.get_secure_cookie("user"):
             portal = self.get_cookie("portal")
             if portal == "1":
                 username = self.get_cookie("name")
-                details = yield patient.get_details(username)
-                self.render("patient.html", Name=username, )
-
+                database = self.db()
+                details = yield database.patient.find_one({"user":username})
+                self.render("patient.html", Name=username, resp=details)
             else:
                 self.redirect("/")
+
+    @coroutine
+    def post(self):
+        username = self.get_cookie("user")
+        hname = self.get_argument("Hname")
+        symp = self.get_argument("symptoms")
+        sit = self.get_argument("situation")
+        ap_details = {
+            "hname": hname,
+            "symptoms": symp,
+            "situation": sit
+        }
+        flag = yield patient.make_appointment(username, self.db(), ap_details)
+        self.write(flag)
 
 
 

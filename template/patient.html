@@ -23,6 +23,9 @@
 		.hide{
 			display: none;
 		}
+        .bold{
+            font-weight: bold;
+        }
 	</style>
 </head>
 
@@ -63,22 +66,37 @@
 		<div class="container col-md-10 right-bar">
             <div class="appointment">
 			<div class="card card-register mx-auto mt-5 bg-dark ">
-      <div class="card-header">Register an Account</div>
+      <div class="card-header">Make an appointment</div>
       <div class="card-body">
-        <form class="was-validated" id="regis" method="post">
+        <form class="was-validated" id="apoints" method="post">
           <div class="form-group">
             <div class="form-row">
               <div class="col-md-12">
-                <label for="exampleInputName">First name</label>
-                <input name="fname" class="form-control" id="exampleInputName" type="text" aria-describedby="nameHelp" placeholder="Enter first name" required>
+                <label for="exampleInputName">Hospital name</label>
+                <input name="Hname" class="form-control" id="exampleInputName" type="text" aria-describedby="nameHelp" placeholder="Enter hospital name" required>
               </div>
             </div>
           </div>
             <div class="form-group">
             <div class="form-row">
               <div class="col-md-12">
-                <label for="symptoms">First </label>
-                  <textarea name="fname" class="form-control" id="symptoms" type="text" aria-describedby="nameHelp" placeholder="Enter first name" required></textarea>
+                <label for="symptoms">Symptoms </label>
+                  <textarea name="symptoms" class="form-control" id="symptoms" type="text" aria-describedby="nameHelp" placeholder="" required></textarea>
+              </div>
+            </div>
+          </div>
+            <div class="form-group">
+            <div class="form-row">
+              <div class="col-md-12">
+                <label for="symptoms">Describe your situation </label>
+                  <textarea name="situation" class="form-control" id="situation" type="text" aria-describedby="nameHelp" placeholder="" required></textarea>
+              </div>
+            </div>
+          </div>
+            <div class="form-group">
+            <div class="form-row">
+              <div class="col-md-12">
+                <input type="submit">
               </div>
             </div>
           </div>
@@ -94,38 +112,38 @@
           <div class="form-group">
             <div class="form-row">
               <div class="col-md-6">
-                <span>First name</span>:{{resp['fname']}}
+                <span class="bold">First name</span>: {{resp['fname']}}
               </div>
             </div>
           </div>
             <div class="form-group">
             <div class="form-row">
               <div class="col-md-6">
-                <span>Last name</span>:{{resp['lname']}}
+                <span class="bold">Last name</span>: {{resp['lname']}}
               </div>
             </div>
           </div>
             <div class="form-group">
             <div class="form-row">
               <div class="col-md-6">
-                <span>email</span>:{{resp['email']}}
+                <span class="bold">email</span>: {{resp['email']}}
               </div>
             </div>
           </div>
             <div class="form-group">
             <div class="form-row">
               <div class="col-md-6">
-                <span>Address</span>:{{resp['address']}}
+                <span class="bold">Address</span>: {{resp['address']}}
               </div>
             </div>
           </div>
             <div class="form-group">
             <div class="form-row">
               <div class="col-md-6">
-                  {% if resp['ap_details'] is not none %}
+                  {% if resp['ap_details'] is not None %}
                   <span><h5>made appointments</h5></span>
-                  <br>Symptomps: head ache, vomiting.
-                  <br>Message: I ate this really bad thing and i am sick, my stomach pain
+                  <br>Symptomps:  head ache, vomiting.
+                  <br>Message:  I ate this really bad thing and i am sick, my stomach pain
                   <br>Doctor appointed: Dr. James
                   {%end%}
               </div>
