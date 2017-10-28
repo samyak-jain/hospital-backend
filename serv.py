@@ -45,10 +45,14 @@ class patient(users):
     @coroutine
     def make_appointment(user, db, ap_details):
         resp = yield db.patient.find_one({'user': user})
-        if resp['ap_details'] is None:
-            Modi = client.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
-            if Modi['updatedExisting']:
-                return True
+        if resp.get('ap_details') is None:
+            x = []
+        else:
+            x = resp['ap_details']
+            x.append(ap_details)
+        Modi = client.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': x}}, upsert=False)
+        if Modi['updatedExisting']:
+            return True
         return False
 
     @classmethod
