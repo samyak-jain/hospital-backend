@@ -8,6 +8,7 @@ from motor import motor_tornado
 from passlib.hash import pbkdf2_sha256
 from tornado.gen import coroutine
 from tornado.options import define, options
+import tornado.options
 
 define("port", default=7000, help="runs on the given port", type=int)
 from bson import ObjectId
@@ -45,14 +46,20 @@ class patient(users):
     @coroutine
     def make_appointment(user, db, ap_details):
         resp = yield db.patient.find_one({'user': user})
-        if resp.get('ap_details') is None:
+        if resp.get('ap_details') == {}:
             x = []
         else:
             x = resp['ap_details']
             x.append(ap_details)
-        Modi = client.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': x}}, upsert=False)
+        Modi = db.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': x}}, upsert=False)
         if Modi['updatedExisting']:
-            return True
+            doc = ap_details['doctor']
+            dbdoc = yield db.doctor.find_one({'user': doc})
+            plist = dbdoc['plist']
+            plist.append(user)
+            Modi2 = db.doctor.update({'_id': dbdoc['_id']}, {'$set': {'plist': plist}}, upsert=False)
+            if Modi2['updatedExisting']:
+                return True
         return False
 
     @classmethod
@@ -86,6 +93,12 @@ class doctor(users):
             listOfDoc.append(dict(email=ele['email'], user=ele['user'], name=ele['fname']))
 
         return listOfDoc
+
+    @staticmethod
+    @coroutine
+    def get_pat(db, doc):
+        resp = yield db.doctor.find_one({'user': doc})
+
 
 
 class MyAppException(tornado.web.HTTPError):
