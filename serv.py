@@ -351,7 +351,8 @@ if __name__ == "__main__":
             (r"/logout", LogoutHandler),
             (r"/portal", PortalHandler),
             (r"/path", PathHandler),
-            (r"/user", PatientHandler)
+            (r"/user", PatientHandler),
+            (r"/doctor", DocHandler),
         ], **settings,
         template_path=os.path.join(os.path.dirname(__file__), "template"),
         static_path=os.path.join(os.path.dirname(__file__), "static"),
