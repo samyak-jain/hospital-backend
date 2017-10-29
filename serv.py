@@ -54,8 +54,7 @@ class patient(users):
         #     x.append(ap_details)
         Modi = yield db.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
         if Modi['updatedExisting']:
-            doc = ap_details['doctor']
-            dbdoc = yield db.doctor.find_one({'fname': doc})
+            dbdoc = yield db.doctor.find_one({'fname': user})
             plist = dbdoc['plist']
             plist.append(user)
             Modi2 = yield db.doctor.update({'_id': dbdoc['_id']}, {'$set': {'plist': plist}}, upsert=False)
