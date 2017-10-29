@@ -44,23 +44,13 @@ class users(object):
 class patient(users):
     @staticmethod
     @coroutine
-    def make_appointment(user, db, ap_details):
-        print(user)
-        resp = yield db.patient.find_one({'user': user})
-        # if resp.get('ap_details') == {}:
-        #     x = []
-        # else:
-        #     x = resp['ap_details']
-        #     x.append(ap_details)
-        Modi = yield db.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
-        if Modi['updatedExisting']:
-            doc = ap_details['doctor']
-            dbdoc = yield db.doctor.find_one({'fname': doc})
-            plist = dbdoc['plist']
-            plist.append(user)
-            Modi2 = yield db.doctor.update({'_id': dbdoc['_id']}, {'$set': {'plist': plist}}, upsert=False)
-            if Modi2['updatedExisting']:
-                return True
+    def make_appointment(duser, db, user):
+        dbdoc = yield db.doctor.find_one({'type': duser})
+        plist = dbdoc['plist']
+        plist.append(user)
+        Modi2 = yield db.doctor.update({'_id': dbdoc['_id']}, {'$set': {'plist': plist}}, upsert=False)
+        if Modi2['updatedExisting']:
+            return True
         return False
 
     # @classmethod
@@ -87,8 +77,10 @@ class doctor(users):
 
     @staticmethod
     @coroutine
-    def get_doc_list(db, cond):
-        resp = yield db.doctor.find({"type": {"$in": cond}})
+    def get_doc_list(db, cond, user, ap_details):
+        resp = yield db.patient.find_one({'user': user})
+        Modi = yield db.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
+        resp = yield db.doctor.find({"type": cond})
         listOfDoc = []
         for ele in resp:
             listOfDoc.append(dict(email=ele['email'], user=ele['user'], name=ele['fname'], description=ele['description'], qualifications=ele['qualifications']))
@@ -272,10 +264,9 @@ class PatientHandler(BaseHandler):
             "situation": sit,
             "doctor": type
         }
-        flag = yield patient.make_appointment(username, self.db(), ap_details)
+
         doctor_data = yield doctor.get_doc_list(self.db(), type)
         self.render("doctorlist.html", response=doctor_data, Name=username)
-        self.write(flag)
 
 
 class DocHandler(BaseHandler):
@@ -331,6 +322,14 @@ class PathHandler(BaseHandler):
                 self.redirect("/user")
             else:
                 self.redirect("/doc")
+
+
+class DocListHandler(BaseHandler):
+    def get(self):
+        duser = self.get_argument("duser")
+        user = self.get_cookie("name")
+        patient.make_appointment(duser, self.db(), user)
+        
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()
