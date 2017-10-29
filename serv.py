@@ -75,9 +75,10 @@ class doctor(users):
     def doc_list(db, cond, user, ap_details):
         resp = yield db.patient.find_one({'user': user})
         Modi = yield db.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
-        resp = yield db.doctor.find({"type": cond})
+        resp = db.doctor.find({"type": cond})
         listOfDoc = []
-        for ele in resp:
+        while (yield resp.fetch_next):
+            ele = resp.next_object()
             listOfDoc.append(dict(email=ele['email'], user=ele['user'], name=ele['fname'], description=ele['description'], qualifications=ele['qualifications']))
         return listOfDoc
 
@@ -319,6 +320,7 @@ class PathHandler(BaseHandler):
 
 
 class DocListHandler(BaseHandler):
+    @coroutine
     def get(self):
         duser = self.get_argument("duser")
         user = self.get_cookie("name")
