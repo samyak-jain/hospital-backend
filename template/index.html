@@ -72,11 +72,12 @@
 						  <li><a href="/Signup">Sign Up</a></li>
 					  	{% elif flag == 1%}
 						  <li><a href="/patient">{{name}}</a></li>
+						  <li class=""><a href="/logout">Log-Out</a></li>
 					  	{% elif flag == 0 %}
 						  <li><a href="/doctor">Dr.{{name}}</a></li>
+						  <li class=""><a href="/logout">Log-Out</a></li>
 					  {% end %}
 				        <!--<li><a data-toggle="modal" data-target="#SignupModal">Sign Up</a></li>-->
-					  	<li class=""><a href="/logout">Log-Out</a></li>
 				      </ul>
 				    </div>
 				</div>
