@@ -63,11 +63,11 @@ class patient(users):
                 return True
         return False
 
-    @classmethod
-    @coroutine
-    def get_details(cls, username, db):
-        resp = yield db.patient.find_one({'user': username})
-        return cls(resp['email'], username, resp['fname'])
+    # @classmethod
+    # @coroutine
+    # def get_details(cls, username, db):
+    #     resp = yield db.patient.find_one({'user': username})
+    #     return cls(resp['email'], username, resp['fname'])
 
 
 class doctor(users):
@@ -78,12 +78,12 @@ class doctor(users):
         resp = yield db.doctor.find_one({"user": username})
         patient_resp = db.patient.find({'ap_details.type': {'$in': resp['type']}})
         return patient_resp
-
-    @classmethod
-    @coroutine
-    def get_details(cls, user, db):
-        resp = yield db.doctor.find_one({'user': user})
-        return cls(email=resp['email'], user=user, name=resp['fname'])
+    #
+    # @classmethod
+    # @coroutine
+    # def get_details(cls, user, db):
+    #     resp = yield db.doctor.find_one({'user': user})
+    #     return cls(email=resp['email'], user=user, name=resp['fname'])
 
     @staticmethod
     @coroutine
@@ -146,11 +146,11 @@ class AuthHandler(BaseHandler):
             portal = self.get_cookie("portal")
             username = self.get_cookie("name")
             if portal == "1":
-                patio = yield patient.get_details(username, self.db())
-                self.render("index.html", tarp=1, name=patio.name)
+                patio = yield self.db().patient.find_one({'user': username})
+                self.render("index.html", tarp=1, name=patio['fname'])
             elif portal =="0":
-                patio = yield doctor.get_details(username, self.db())
-                self.render("index.html", tarp=0, name=patio.name)
+                patio = yield self.db().doctor.find_one({'user': username})
+                self.render("index.html", tarp=0, name=patio['fname'])
         else:
             self.render("index.html", tarp=None, name="Amrut")
 
@@ -186,6 +186,11 @@ class SignUpHandler(BaseHandler):
     def post(self, *args, **kwargs):
         username = self.get_argument("user")
         password = self.get_argument("pass")
+
+        img = self.get_argument("img")
+        if img == "":
+            img = r"http://jennstrends.com/wp-content/uploads/2013/10/bad-profile-pic-2.jpeg"
+
         user_details = {
             "user": username,
             "fname": self.get_argument("fname"),
@@ -193,6 +198,7 @@ class SignUpHandler(BaseHandler):
             "email": self.get_argument("email"),
             "address": self.get_argument("address"),
             "portal": self.get_argument("portal"),
+            "img": img,
         }
 
         db_client = self.db()
@@ -270,6 +276,20 @@ class PatientHandler(BaseHandler):
         doctor_data = yield doctor.get_doc_list(self.db(), type)
         self.render("doctorlist.html", response=doctor_data, Name=username)
         self.write(flag)
+
+
+class DocHandler(BaseHandler):
+    @coroutine
+    def get(self):
+        if self.get_secure_cookie("user"):
+            portal = self.get_cookie("portal")
+            if portal == "0":
+                username = self.get_cookie("name")
+                database = self.db()
+                details = yield database.patient.find_one({"user":username})
+                self.render("blank.html", Name=username, resp=details)
+            else:
+                self.redirect("/")
 
 
 class my404handler(BaseHandler):
