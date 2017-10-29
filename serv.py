@@ -48,6 +48,8 @@ class patient(users):
     def make_appointment(duser, db, user):
         dbdoc = yield db.doctor.find_one({'user': duser})
         plist = dbdoc['plist']
+        if user in plist:
+            return False
         plist.append(user)
         Modi2 = yield db.doctor.update({'_id': dbdoc['_id']}, {'$set': {'plist': plist}}, upsert=False)
         if Modi2['updatedExisting']:
