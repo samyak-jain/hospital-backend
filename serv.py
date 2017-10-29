@@ -237,7 +237,7 @@ class SignUpHandler(BaseHandler):
         hash_pass = pbkdf2_sha256.hash(password)
 
         database_auth.insert_one({"user": username, "pass": hash_pass, "portal": user_details['portal']})
-        database_details.insert_one(user_details)
+        yield database_details.insert_one(user_details)
 
         self.set_cookie("name",username)
         self.set_secure_cookie("user", username)
