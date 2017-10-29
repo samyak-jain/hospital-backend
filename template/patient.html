@@ -12,10 +12,13 @@
     <link rel="stylesheet" href="../static/css/signup.css">
   	<link rel="stylesheet" href="../static/css/sb-admin.css">
 	<style type="text/css">
+        html{
+            overflow-y: hidden;
+        }
 		.left-bar{
-			height: 43.5em;
+			height: 45.5em;
 			width: 60%;
-			background-color: #1d2124;
+			background-color: #343A40;
 		}
 		a{
 			color: white;
@@ -59,7 +62,7 @@
 		 		<br>
 			 <a class="btn" id="appoint" href="">Make an appointment</a>
 		 		<br>
-			 <a class="btn" id="logout" href="">Logout</a>
+			 <a class="btn" id="logout" href="/logout">Logout</a>
 		 		<br>
 			 <a class="btn" id="detail" href="">Your details</a>
 	 </div>
@@ -69,14 +72,14 @@
       <div class="card-header">Make an appointment</div>
       <div class="card-body">
         <form class="was-validated" id="apoints" method="post">
-          <div class="form-group">
-            <div class="form-row">
-              <div class="col-md-12">
-                <label for="exampleInputName">Hospital name</label>
-                <input name="Hname" class="form-control" id="exampleInputName" type="text" aria-describedby="nameHelp" placeholder="Enter hospital name" required>
-              </div>
-            </div>
-          </div>
+          <!--<div class="form-group">-->
+            <!--<div class="form-row">-->
+              <!--<div class="col-md-12">-->
+                <!--<label for="exampleInputName">Hospital name</label>-->
+                <!--<input name="Hname" class="form-control" id="exampleInputName" type="text" aria-describedby="nameHelp" placeholder="Enter hospital name" required>-->
+              <!--</div>-->
+            <!--</div>-->
+          <!--</div>-->
             <div class="form-group">
             <div class="form-row">
               <div class="col-md-12">
@@ -96,7 +99,24 @@
             <div class="form-group">
             <div class="form-row">
               <div class="col-md-12">
-                <input type="submit">
+                  <label for="doc-sel">What type of doctor do you require?</label>
+                <br>
+                  <select class="custom-select" id="doc-sel" name="type">
+                    <option selected>ENT</option>
+                    <option value="ent">ENT</option>
+                    <option value="physician">physician</option>
+                    <option value="orthodontist">orthodontist</option>
+                    <option value="cardiologist">cardiologist</option>
+                    <option value="neurologist">neurologist</option>
+                    <option value="psychiatrist">psychiatrist</option>
+                </select>
+              </div>
+            </div>
+          </div>
+            <div class="form-group">
+            <div class="form-row">
+              <div class="col-md-12">
+                <input type="submit" class="btn btn-primary">
               </div>
             </div>
           </div>
@@ -140,11 +160,11 @@
             <div class="form-group">
             <div class="form-row">
               <div class="col-md-6">
-                  {% if resp['ap_details'] is not None %}
                   <span><h5>made appointments</h5></span>
-                  <br>Symptomps:  head ache, vomiting.
-                  <br>Message:  I ate this really bad thing and i am sick, my stomach pain
-                  <br>Doctor appointed: Dr. James
+                  {% if resp['ap_details'] != {} %}
+                  <br>Symptomps:  {{resp['ap_details']['symptoms']}}
+                  <br>Description:  {{resp['ap_details']['situation']}}
+                  <br>Your hsitory: {{resp['history']}}
                   {%end%}
               </div>
             </div>

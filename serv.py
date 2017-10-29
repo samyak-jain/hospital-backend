@@ -45,19 +45,20 @@ class patient(users):
     @staticmethod
     @coroutine
     def make_appointment(user, db, ap_details):
+        print(user)
         resp = yield db.patient.find_one({'user': user})
         if resp.get('ap_details') == {}:
             x = []
         else:
             x = resp['ap_details']
             x.append(ap_details)
-        Modi = db.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': x}}, upsert=False)
+        Modi = yield db.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
         if Modi['updatedExisting']:
             doc = ap_details['doctor']
-            dbdoc = yield db.doctor.find_one({'user': doc})
+            dbdoc = yield db.doctor.find_one({'fname': doc})
             plist = dbdoc['plist']
             plist.append(user)
-            Modi2 = db.doctor.update({'_id': dbdoc['_id']}, {'$set': {'plist': plist}}, upsert=False)
+            Modi2 = yield db.doctor.update({'_id': dbdoc['_id']}, {'$set': {'plist': plist}}, upsert=False)
             if Modi2['updatedExisting']:
                 return True
         return False
@@ -90,7 +91,7 @@ class doctor(users):
         resp = yield db.doctor.find({"type": {"$in": cond}})
         listOfDoc = []
         for ele in resp:
-            listOfDoc.append(dict(email=ele['email'], user=ele['user'], name=ele['fname']))
+            listOfDoc.append(dict(email=ele['email'], user=ele['user'], name=ele['fname'], description=ele['description'], qualifications=ele['qualifications']))
 
         return listOfDoc
 
@@ -98,7 +99,7 @@ class doctor(users):
     @coroutine
     def get_pat(db, doc):
         resp = yield db.doctor.find_one({'user': doc})
-
+        return resp['plist']
 
 
 class MyAppException(tornado.web.HTTPError):
@@ -168,6 +169,8 @@ class AuthHandler(BaseHandler):
             }))
             return
         response = yield db_client.auth.find_one({'user': username})
+        if response is None:
+            raise MyAppException(status_code=400, reason="Invalid Credentials.")
         portal = response['portal']
         self.set_cookie("portal", portal)
         self.set_cookie("name", username)
@@ -198,9 +201,15 @@ class SignUpHandler(BaseHandler):
         if user_details['portal'] == "1":
             database_details = db_client["patient"]
             user_details['ap_details'] = dict()
+            user_details['history'] = self.get_argument("history")
+
         elif user_details['portal'] == "0":
             database_details = db_client["doctor"]
             user_details['type'] = list()
+            user_details['plist'] = list()
+            user_details['description'] = self.get_argument("description")
+            user_details['type'] = self.get_argument("specialization")
+            user_details['qualifications'] = self.get_argument("qualifications")
 
         find_user = yield database_auth.find_one({"user": username})
         find_email = yield database_details.find_one({"email": user_details["email"]})
@@ -227,7 +236,7 @@ class SignUpHandler(BaseHandler):
         self.set_cookie("name",username)
         self.set_secure_cookie("user", username)
         self.set_cookie("portal", user_details['portal'])
-        self.redirect("portal.html")
+        self.redirect("/")
 
 
 class PatientHandler(BaseHandler):
@@ -243,20 +252,24 @@ class PatientHandler(BaseHandler):
             else:
                 self.redirect("/")
 
+
     @coroutine
     def post(self):
-        username = self.get_cookie("user")
-        hname = self.get_argument("Hname")
+        username = self.get_cookie("name")
         symp = self.get_argument("symptoms")
         sit = self.get_argument("situation")
+        type = self.get_argument("type")
+
         ap_details = {
-            "hname": hname,
+            # "hname": hname,
             "symptoms": symp,
-            "situation": sit
+            "situation": sit,
+            "doctor": type
         }
         flag = yield patient.make_appointment(username, self.db(), ap_details)
+        doctor_data = yield doctor.get_doc_list(self.db(), type)
+        self.render("doctorlist.html", response=doctor_data, Name=username)
         self.write(flag)
-
 
 
 class my404handler(BaseHandler):
@@ -302,11 +315,11 @@ class PathHandler(BaseHandler):
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()
-    client = motor_tornado.MotorClient("mongodb://"+os.environ['dbuser']+":"+os.environ['dbpass']+"@ds117605.mlab.com:17605/tornado")
+    client = motor_tornado.MotorClient("mongodb://amrut:excalibur@ds117605.mlab.com:17605/tornado")
     settings = {
         "default_handler_class": my404handler,
         "debug": True,
-        "cookie_secret": os.environ['cookie_secret'],
+        "cookie_secret": "b'LPBDqiL4S8KGi54y5eXFLoSiKE+wz0vajAU6K9aZOJ4='",
         "login_url": "/login",
         "db_client": client
     }
