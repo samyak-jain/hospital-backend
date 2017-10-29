@@ -60,7 +60,7 @@
  <div class="row">
 	 <div class="left-bar col-md-2">
 		 		<br>
-			 <a class="btn" id="appoint" href="">Make an appointment</a>
+			 <a class="btn" id="appoint" href="">Patient appointment</a>
 		 		<br>
 			 <a class="btn" id="logout" href="/logout">Logout</a>
 		 		<br>
@@ -68,62 +68,19 @@
 	 </div>
 		<div class="container col-md-10 right-bar">
             <div class="appointment">
-			<div class="card card-register mx-auto mt-5 bg-dark ">
-      <div class="card-header">Make an appointment</div>
-      <div class="card-body">
-        <form class="was-validated" id="apoints" method="post">
-          <!--<div class="form-group">-->
-            <!--<div class="form-row">-->
-              <!--<div class="col-md-12">-->
-                <!--<label for="exampleInputName">Hospital name</label>-->
-                <!--<input name="Hname" class="form-control" id="exampleInputName" type="text" aria-describedby="nameHelp" placeholder="Enter hospital name" required>-->
-              <!--</div>-->
-            <!--</div>-->
-          <!--</div>-->
-            <div class="form-group">
-            <div class="form-row">
-              <div class="col-md-12">
-                <label for="symptoms">Symptoms </label>
-                  <textarea name="symptoms" class="form-control" id="symptoms" type="text" aria-describedby="nameHelp" placeholder="" required></textarea>
-              </div>
-            </div>
-          </div>
-            <div class="form-group">
-            <div class="form-row">
-              <div class="col-md-12">
-                <label for="symptoms">Describe your situation </label>
-                  <textarea name="situation" class="form-control" id="situation" type="text" aria-describedby="nameHelp" placeholder="" required></textarea>
-              </div>
-            </div>
-          </div>
-            <div class="form-group">
-            <div class="form-row">
-              <div class="col-md-12">
-                  <label for="doc-sel">What type of doctor do you require?</label>
-                <br>
-                  <select class="custom-select" id="doc-sel" name="type">
-                    <option selected>ENT</option>
-                    <option value="ent">ENT</option>
-                    <option value="physician">physician</option>
-                    <option value="orthodontist">orthodontist</option>
-                    <option value="cardiologist">cardiologist</option>
-                    <option value="neurologist">neurologist</option>
-                    <option value="psychiatrist">psychiatrist</option>
-                </select>
-              </div>
-            </div>
-          </div>
-            <div class="form-group">
-            <div class="form-row">
-              <div class="col-md-12">
-                <input type="submit" class="btn btn-primary">
-              </div>
-            </div>
-          </div>
-        </form>
-        </div>
-	  </div>
- 	</div>
+            {% for i in resp %}
+            <div class="card card-register mx-auto mt-5 bg-dark ">
+                <div class="card-header"></div>
+                    <div class="card-body">
+                        <img src="{{i['url']}}" style="width:50px;height:50px;">
+                        <br>symptoms: <br>
+                        {{i['symptoms']}}
+                        <br>description: <br>
+                        {{i['description']}}
+                    </div>
+                </div>
+ 	        </div>
+            {%end%}
         <div class="hide" id="detailss">
          <div class="card card-register mx-auto mt-5 bg-dark ">
       <div class="card-header">Your details</div>
@@ -170,8 +127,9 @@
                   <span><h5>appointments</h5></span>
                   {% if resp['ap_details'] != {} %}
                   <br>Patients:
-
-                    {{resp['plist']}}
+                    {% for i in resp['plist']%}
+                        {{i}}
+                    {%end%}
                   {%end%}
               </div>
             </div>
