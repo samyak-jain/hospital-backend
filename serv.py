@@ -312,7 +312,6 @@ class PathHandler(BaseHandler):
             else:
                 self.redirect("/doc")
 
-
 if __name__ == "__main__":
     tornado.options.parse_command_line()
     client = motor_tornado.MotorClient("mongodb://amrut:excalibur@ds117605.mlab.com:17605/tornado")
@@ -340,3 +339,4 @@ if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(os.environ.get("PORT",options.port))
     tornado.ioloop.IOLoop.instance().start()
+
