@@ -79,7 +79,7 @@ class doctor(users):
         listOfDoc = []
         while (yield resp.fetch_next):
             ele = resp.next_object()
-            listOfDoc.append(dict(email=ele['email'], user=ele['user'], name=ele['fname'], description=ele['description'], qualifications=ele['qualifications']))
+            listOfDoc.append(dict(email=ele['email'], user=ele['user'], fname=ele['fname'], lname=ele['lname'],img=ele['img'], description=ele['description'], qualifications=ele['qualifications']))
         return listOfDoc
 
     @staticmethod
@@ -262,7 +262,7 @@ class PatientHandler(BaseHandler):
 
         doctor_data = yield doctor.doc_list(self.db(), type, username, ap_details)
         self.render("doctorlist.html", response=doctor_data, Name=username)
-
+        # self.write(json.dumps(doctor_data))
 
 class DocHandler(BaseHandler):
     @coroutine
@@ -322,7 +322,7 @@ class PathHandler(BaseHandler):
 class DocListHandler(BaseHandler):
     @coroutine
     def get(self):
-        duser = self.get_argument("duser")
+        duser = self.get_argument("dname")
         user = self.get_cookie("name")
         patient.make_appointment(duser, self.db(), user)
         
@@ -348,6 +348,7 @@ if __name__ == "__main__":
             (r"/path", PathHandler),
             (r"/user", PatientHandler),
             (r"/doctor", DocHandler),
+            (r"/appoint", DocListHandler)
         ], **settings,
         template_path=os.path.join(os.path.dirname(__file__), "template"),
         static_path=os.path.join(os.path.dirname(__file__), "static"),
