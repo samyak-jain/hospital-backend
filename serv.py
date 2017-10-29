@@ -47,11 +47,11 @@ class patient(users):
     def make_appointment(user, db, ap_details):
         print(user)
         resp = yield db.patient.find_one({'user': user})
-        if resp.get('ap_details') == {}:
-            x = []
-        else:
-            x = resp['ap_details']
-            x.append(ap_details)
+        # if resp.get('ap_details') == {}:
+        #     x = []
+        # else:
+        #     x = resp['ap_details']
+        #     x.append(ap_details)
         Modi = yield db.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
         if Modi['updatedExisting']:
             doc = ap_details['doctor']
