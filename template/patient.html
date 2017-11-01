@@ -47,22 +47,28 @@
             <!--<span class="nav-link-text">Charts</span>-->
           <!--</a>-->
         <!--</li>-->
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Tables">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Hospitals">
           <a class="nav-link" href="/portal">
             <i class="fa fa-fw fa-table"></i>
             <span class="nav-link-text">Hospitals</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Tables">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Your details">
           <a class="nav-link" id="detail">
             <i class="fa fa-fw fa-file"></i>
             <span class="nav-link-text">Your details</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Make an appointment">
           <a class="nav-link" id="appoint">
             <i class="fa fa-fw fa-wrench"></i>
             <span class="nav-link-text">Make an appointment</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Appointments">
+          <a class="nav-link" id="resp">
+            <i class="fa fa-fw fa-tablet"></i>
+            <span class="nav-link-text">Check Appointments</span>
           </a>
         </li>
         <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Example Pages">
@@ -304,18 +310,43 @@
               <br>
                 <span class="item-attributes"><strong>Email: </strong></span><span class="colo"><br> {{resp['email']}}<br></span>
                 <span class="item-attributes"><strong>Address: </strong></span><span class="colo"><br> {{resp['address']}}<br></span>
-                <span class="item-attributes"><strong>made appointments: </strong></span><br>
-              <span class="colo">
-                      {% if resp['ap_details'] != {} %}
-                      <br>Symptomps:  {{resp['ap_details']['symptoms']}}
-                      <br>Description:  {{resp['ap_details']['situation']}}
-                      <br>Your hsitory: {{resp['history']}}
-                      {%end%}
-            </span>
-            </span>
+                <!--<span class="item-attributes"><strong>made appointments: </strong></span><br>-->
+              <!--<span class="colo">-->
+                      <!--{% if resp['ap_details'] != {} %}-->
+                      <!--<br>Symptomps:  {{resp['ap_details']['symptoms']}}-->
+                      <!--<br>Description:  {{resp['ap_details']['situation']}}-->
+                      <!--<br>Your hsitory: {{resp['history']}}-->
+                      <!--{%end%}-->
+            <!--</span>-->
+            <!--</span>-->
             </div>
         </div>
     </div>
+          </div>
+            <div class="response">
+              {% for ap in data %}
+              <div class="card text-white bg-dark mb-3" style="max-width: 20rem;">
+              <div class="card-header">appointment with Dr. {{ap['doctor']}}</div>
+              <div class="card-body">
+                {% if !ap['status'] %}
+              <h4 class="card-title text-danger">Pending</h4>
+              <p class="card-text">
+                  <span class="item-attributes"><strong>situation: </strong>ap['situation']</span><br>
+                  <span class="item-attributes"><strong>description: </strong>ap['description']</span><br>
+                <span class="item-attributes"><strong>doctor: </strong>ap['doctor']</span><br>
+              </p>
+                {%else%}
+                <h4 class="card-title text-success">Completed</h4>
+                <p class="card-text">
+                  <span class="item-attributes"><strong>situation </strong>ap['situation']</span><br>
+                  <span class="item-attributes"><strong>description: </strong>ap['description']</span><br>
+                <span class="item-attributes"><strong>doctor: </strong>ap['doctor']</span><br>
+                  <span class="item-attributes"><strong>Response: </strong>ap['response']</span><br>
+              </p>
+                {%end%}
+              </div>
+              </div>
+              {%end%}
           </div>
             {%end%}
         </div>
@@ -365,18 +396,29 @@
     <script>
       $().ready(function() {
           $("#detailss").hide();
+          $(".response").hide();
         $(function () {
           $("#appoint").click(function(e){
               e.preventDefault();
               console.log('appoint clicked !');
               $(".appointment").show();
 			  $("#detailss").hide();
+			  $(".response").hide();
 	  });
 	 $("#detail").click(function(e){
 	     e.preventDefault();
 	     console.log('detail clicked !');
 	      $(".appointment").hide();
 	      $("#detailss").show();
+	      $(".response").hide();
+
+        });
+	 $("#resp").click(function(e){
+	     e.preventDefault();
+	     console.log('detail clicked !');
+	      $(".appointment").hide();
+	      $("#detailss").hide();
+	      $(".response").show();
 
         });
 	  });

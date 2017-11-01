@@ -196,19 +196,22 @@
 	</section>
 	<!--/ about-->
 	<!--doctor team-->
+
 	<section id="doctor-team" class="section-padding">
 		<div class="container">
 			<div class="row">
+
 				<div class="col-md-12">
 					<h2 class="ser-title">Meet Our Doctors!</h2>
 					<hr class="botm-line">
 				</div>
+				{% for doc in listofdoc %}
 				<div class="col-md-3 col-sm-3 col-xs-6">
 			      <div class="thumbnail"> 
-			      	<img src="../static/img/IMG_39081.jpg" alt="..." class="team-img">
+			      	<img src="{{doc['img']}}" alt="..." class="team-img" style="width:250px;height:220px;">
 			        <div class="caption">
-			          <h3>Dr. S R Nandakumar</h3>
-			          <p>General Physician</p>
+			          <h3>Dr. {{doc['fname']}} {{doc['lname']}}</h3>
+			          <p>{{doc['type']}}</p>
 			          <ul class="list-inline">
 			            <li><a href="https://www.facebook.com/pritish.thombare?ref=br_rs"><i class="fa fa-facebook"></i></a></li>
 			            <li><a href="#"><i class="fa fa-twitter"></i></a></li>
@@ -217,48 +220,49 @@
 			        </div>
 			      </div>
 			    </div>
-			    <div class="col-md-3 col-sm-3 col-xs-6">
-			      <div class="thumbnail"> 
-			      	<img src="../static/img/IMG_39081.jpg" alt="..." class="team-img">
-			        <div class="caption">
-			          <h3>Dr. Go Bharani</h3>
-			          <p>Diabetologist</p>
-			          <ul class="list-inline">
-			            <li><a href="https://www.facebook.com/saiteja.ganji"><i class="fa fa-facebook"></i></a></li>
-			            <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-			            <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
-			          </ul>
-			        </div>
-			      </div>
-			    </div>
-			    <div class="col-md-3 col-sm-3 col-xs-6">
-			      <div class="thumbnail"> 
-			      	<img src="../static/img/IMG_39081.jpg" alt="..." class="team-img">
-			        <div class="caption">
-			          <h3>Dr. K Thirumal Babu</h3>
-			          <p>Cardiologist</p>
-			          <ul class="list-inline">
-			            <li><a href="https://www.facebook.com/jheel4"><i class="fa fa-facebook"></i></a></li>
-			            <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-			            <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
-			          </ul>
-			        </div>
-			      </div>
-			    </div>
-			    <div class="col-md-3 col-sm-3 col-xs-6">
-			      <div class="thumbnail"> 
-			      	<img src="../static/img/IMG_39081.jpg" alt="..." class="team-img">
-			        <div class="caption">
-			          <h3>Dr. N Thyagarajan</h3>
-			          <p>Psychiatrist</p>
-			          <ul class="list-inline">
-			            <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-			            <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-			            <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
-			          </ul>
-			        </div>
-			      </div>
-			    </div>
+				{%end%}
+			    <!--<div class="col-md-3 col-sm-3 col-xs-6">-->
+			      <!--<div class="thumbnail"> -->
+			      	<!--<img src="../static/img/IMG_39081.jpg" alt="..." class="team-img">-->
+			        <!--<div class="caption">-->
+			          <!--<h3>Dr. listofdoc[3][]</h3>-->
+			          <!--<p>Diabetologist</p>-->
+			          <!--<ul class="list-inline">-->
+			            <!--<li><a href="https://www.facebook.com/saiteja.ganji"><i class="fa fa-facebook"></i></a></li>-->
+			            <!--<li><a href="#"><i class="fa fa-twitter"></i></a></li>-->
+			            <!--<li><a href="#"><i class="fa fa-google-plus"></i></a></li>-->
+			          <!--</ul>-->
+			        <!--</div>-->
+			      <!--</div>-->
+			    <!--</div>-->
+			    <!--<div class="col-md-3 col-sm-3 col-xs-6">-->
+			      <!--<div class="thumbnail"> -->
+			      	<!--<img src="../static/img/IMG_39081.jpg" alt="..." class="team-img">-->
+			        <!--<div class="caption">-->
+			          <!--<h3>Dr. K Thirumal Babu</h3>-->
+			          <!--<p>Cardiologist</p>-->
+			          <!--<ul class="list-inline">-->
+			            <!--<li><a href="https://www.facebook.com/jheel4"><i class="fa fa-facebook"></i></a></li>-->
+			            <!--<li><a href="#"><i class="fa fa-twitter"></i></a></li>-->
+			            <!--<li><a href="#"><i class="fa fa-google-plus"></i></a></li>-->
+			          <!--</ul>-->
+			        <!--</div>-->
+			      <!--</div>-->
+			    <!--</div>-->
+			    <!--<div class="col-md-3 col-sm-3 col-xs-6">-->
+			      <!--<div class="thumbnail"> -->
+			      	<!--<img src="../static/img/IMG_39081.jpg" alt="..." class="team-img">-->
+			        <!--<div class="caption">-->
+			          <!--<h3>Dr. N Thyagarajan</h3>-->
+			          <!--<p>Psychiatrist</p>-->
+			          <!--<ul class="list-inline">-->
+			            <!--<li><a href="#"><i class="fa fa-facebook"></i></a></li>-->
+			            <!--<li><a href="#"><i class="fa fa-twitter"></i></a></li>-->
+			            <!--<li><a href="#"><i class="fa fa-google-plus"></i></a></li>-->
+			          <!--</ul>-->
+			        <!--</div>-->
+			      <!--</div>-->
+			    <!--</div>-->
 			</div>
 		</div>
 	</section>

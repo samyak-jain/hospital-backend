@@ -44,17 +44,26 @@ class users(object):
 class patient(users):
     @staticmethod
     @coroutine
-    def make_appointment(duser, db, user):
+    def make_appointment(duser, db, user, ap_details):
         dbdoc = yield db.doctor.find_one({'user': duser})
         plist = dbdoc['plist']
         if user in plist:
             return False
-        resp = yield db.patient.find_one({'user': user})
-        plist.append(user)
-        ap_details = resp['ap_details']
+        # resp = yield db.patient.find_one({'user': user})
+        # plist.append(user)
+        # ap_details = resp['ap_details']
+        appointment = yield db.appointments.find_one({"user": user})
         ap_details['doctor'] = duser
         ap_details['status'] = False
-        Modi = yield db.appointments.insert_one({"user": user, user: ap_details})
+        if appointment is not None:
+            ap_list = appointment[user]
+        else:
+            ap_list = list()
+        ap_list.append(ap_details)
+        if appointment is None:
+            Modi = yield db.appointments.insert_one({"user": user, user: ap_list})
+        else:
+            Modi = yield db.patient.update({'_id': appointment['_id']}, {'$set': {user: ap_details}}, upsert=False)
         Modi2 = yield db.doctor.update({'_id': dbdoc['_id']}, {'$set': {'plist': plist}}, upsert=False)
 
         if Modi2['updatedExisting']:
@@ -78,14 +87,21 @@ class doctor(users):
 
     @staticmethod
     @coroutine
-    def doc_list(db, cond, user, ap_details):
-        resp = yield db.patient.find_one({'user': user})
+    def doc_list(db, cond, user):
+        # resp = yield db.patient.find_one({'user': user})
         appoint_det = yield db.appointments.find_one({'user': user})
         if appoint_det is not None:
-            return False
-        Modi = yield db.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
-        if not Modi['updatedExisting']:
-            return False
+            check_list = appoint_det[user]
+            counter = 0
+            if len(check_list)>=3:
+                for check in check_list:
+                    if check['status'] == False:
+                        counter+=1
+            if counter>=3:
+                return False
+        # Modi = yield db.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
+        # if not Modi['updatedExisting']:
+        #     return False
         resp = db.doctor.find({"type": cond})
         listOfDoc = []
         while (yield resp.fetch_next):
@@ -140,17 +156,22 @@ class BaseHandler(tornado.web.RequestHandler):
 class AuthHandler(BaseHandler):
     @coroutine
     def get(self):
+        type = ['cardiologist','neurologist','psychiatrist','physician']
+        listofdoc = list()
+        for i in type:
+            doc = yield self.db().doctor.find_one({"type":i})
+            listofdoc.append(doc)
         if bool(self.get_secure_cookie("user")):
             portal = self.get_cookie("portal")
             username = self.get_cookie("name")
             if portal == "1":
                 patio = yield self.db().patient.find_one({'user': username})
-                self.render("index.html", tarp=1, name=patio['fname'])
+                self.render("index.html", tarp=1, name=patio['fname'], listofdoc=listofdoc)
             elif portal =="0":
                 patio = yield self.db().doctor.find_one({'user': username})
-                self.render("index.html", tarp=0, name=patio['fname'])
+                self.render("index.html", tarp=0, name=patio['fname'], listofdoc=listofdoc)
         else:
-            self.render("index.html", tarp=None, name="Amrut")
+            self.render("index.html", tarp=None, name="Amrut", listofdoc=listofdoc)
 
     @coroutine
     def post(self):
@@ -243,40 +264,6 @@ class SignUpHandler(BaseHandler):
         self.redirect("/")
 
 
-class PatientHandler(BaseHandler):
-    @coroutine
-    def get(self):
-        if self.get_secure_cookie("user"):
-            portal = self.get_cookie("portal")
-            if portal == "1":
-                username = self.get_cookie("name")
-                database = self.db()
-                details = yield database.patient.find_one({"user": username})
-                self.render("patient.html", Name=username, resp=details, error=False)
-            else:
-                self.redirect("/")
-
-
-    @coroutine
-    def post(self):
-        username = self.get_cookie("name")
-        symp = self.get_argument("symptoms")
-        sit = self.get_argument("situation")
-        type = self.get_argument("type")
-
-        ap_details = {
-            # "hname": hname,
-            "symptoms": symp,
-            "situation": sit,
-            "doctor": type
-        }
-        doctor_data = yield doctor.doc_list(self.db(), type, username, ap_details)
-        if doctor_data:
-            self.render("doctorlist.html", response=doctor_data, Name=username, error=False)
-        elif doctor_data == False:
-            self.render("patient.html", resp=doctor_data, Name=username, error=True)
-        # self.write(json.dumps(doctor_data))
-
 class DocHandler(BaseHandler):
     @coroutine
     def get(self):
@@ -343,14 +330,48 @@ class DocListHandler(BaseHandler):
     def get(self):
         duser = self.get_argument("dname")
         user = self.get_cookie("name")
-        flag = yield patient.make_appointment(duser, self.db(), user)
+        flag = yield patient.make_appointment(duser, self.db(), user, self.settings['ap_details'])
         if flag:
             self.write("Your appointment has been made successfully.")
             return
         else:
             self.write("Error in making appointment")
             return
-        
+
+
+class PatientHandler(BaseHandler):
+    @coroutine
+    def get(self):
+        if self.get_secure_cookie("user"):
+            portal = self.get_cookie("portal")
+            if portal == "1":
+                username = self.get_cookie("name")
+                database = self.db()
+                details = yield database.patient.find_one({"user": username})
+                self.render("patient.html", Name=username, resp=details, error=False)
+            else:
+                self.redirect("/")
+
+
+    @coroutine
+    def post(self):
+        username = self.get_cookie("name")
+        symp = self.get_argument("symptoms")
+        sit = self.get_argument("situation")
+        type = self.get_argument("type")
+
+        ap_details = {
+            "symptoms": symp,
+            "situation": sit,
+            "doctor": type
+        }
+        self.settings['ap_details'] = ap_details
+        doctor_data = yield doctor.doc_list(self.db(), type, username)
+        if doctor_data:
+            self.render("doctorlist.html", response=doctor_data, Name=username, error=False)
+        elif doctor_data == False:
+            self.render("patient.html", resp=doctor_data, Name=username, error=True)
+
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()
@@ -360,8 +381,10 @@ if __name__ == "__main__":
         "debug": True,
         "cookie_secret": "b'LPBDqiL4S8KGi54y5eXFLoSiKE+wz0vajAU6K9aZOJ4='",
         "login_url": "/login",
-        "db_client": client
+        "db_client": client,
+        "ap_details": dict()
     }
+    test = dict()
     app = tornado.web.Application(
         handlers=[
             (r"/", AuthHandler),
