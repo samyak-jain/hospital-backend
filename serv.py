@@ -283,6 +283,20 @@ class DocHandler(BaseHandler):
             else:
                 self.redirect("/")
 
+    @coroutine
+    def post(self, *args, **kwargs):
+        response = self.get_argument("response")
+        username = self.get_argument("patient")
+
+        resp = yield self.db().patient.find_one({"user": username})
+        ap_details = resp['ap_details']
+        for i in range(len(ap_details)):
+            if ap_details[i]['status'] == False:
+                ap_details[i]['response'] = response
+                break
+        Modi = yield self.db().patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
+        return Modi['updatedExisiting']
+
 
 class my404handler(BaseHandler):
     def get(self):
