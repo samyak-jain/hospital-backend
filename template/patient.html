@@ -312,42 +312,44 @@
                 <span class="item-attributes"><strong>Address: </strong></span><span class="colo"><br> {{resp['address']}}<br></span>
                 <!--<span class="item-attributes"><strong>made appointments: </strong></span><br>-->
               <!--<span class="colo">-->
-                      <!--{% if resp['ap_details'] != {} %}-->
-                      <!--<br>Symptomps:  {{resp['ap_details']['symptoms']}}-->
-                      <!--<br>Description:  {{resp['ap_details']['situation']}}-->
-                      <!--<br>Your hsitory: {{resp['history']}}-->
-                      <!--{%end%}-->
+                      <!-- if resp['ap_details'] != {} -->
+                      <!--<br>Symptomps:  resp['ap_details']['symptoms']-->
+                      <!--<br>Description:  resp['ap_details']['situation']-->
+                      <!--<br>Your hsitory: resp['history']-->
+                      <!---->
             <!--</span>-->
             <!--</span>-->
             </div>
         </div>
     </div>
           </div>
+          {% if data != []%}
             <div class="response">
               {% for ap in data %}
               <div class="card text-white bg-dark mb-3" style="max-width: 20rem;">
               <div class="card-header">appointment with Dr. {{ap['doctor']}}</div>
               <div class="card-body">
-                {% if !ap['status'] %}
+                {% if not ap['status'] %}
               <h4 class="card-title text-danger">Pending</h4>
               <p class="card-text">
-                  <span class="item-attributes"><strong>situation: </strong>ap['situation']</span><br>
-                  <span class="item-attributes"><strong>description: </strong>ap['description']</span><br>
-                <span class="item-attributes"><strong>doctor: </strong>ap['doctor']</span><br>
+                  <span class="item-attributes"><strong>symptoms: </strong></span><span class="colo">{{ap['symptoms']}}</span><br>
+                  <span class="item-attributes"><strong>description: </strong></span><span class="colo">{{ap['situation']}}</span><br>
+                <span class="item-attributes"><strong>doctor: </strong></span><span class="colo">{{ap['doctor']}}</span><br>
               </p>
                 {%else%}
                 <h4 class="card-title text-success">Completed</h4>
                 <p class="card-text">
-                  <span class="item-attributes"><strong>situation </strong>ap['situation']</span><br>
-                  <span class="item-attributes"><strong>description: </strong>ap['description']</span><br>
-                <span class="item-attributes"><strong>doctor: </strong>ap['doctor']</span><br>
-                  <span class="item-attributes"><strong>Response: </strong>ap['response']</span><br>
+                  <span class="item-attributes"><strong>symptoms: </strong></span><span class="colo">{{ap['symptoms']}}</span><br>
+                  <span class="item-attributes"><strong>description: </strong></span><span class="colo">{{ap['situation']}}</span><br>
+                <span class="item-attributes"><strong>doctor: </strong></span><span class="colo">{{ap['doctor']}}</span><br>
+                  <span class="item-attributes"><strong>Response: </strong></span><span class="colo">{{ap['response']}}</span><br>
               </p>
                 {%end%}
               </div>
               </div>
               {%end%}
           </div>
+          {%end%}
             {%end%}
         </div>
       </div>

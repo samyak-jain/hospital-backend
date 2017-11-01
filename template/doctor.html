@@ -225,7 +225,10 @@
             <span style="color:black;">
           <h1>Home</h1>
           <p>Welcome Dr.{{Name}}!</p>
-            </span>
+              </span>
+            <hr class="">
+            <h3 class="bolo">Patient Appointments</h3>
+          <form method="post">
           {% for i in resp %}
           <div class="rounded bg-dark item-body row">
         <div class="item-image col-md-3">
@@ -239,11 +242,23 @@
                 </div>
               <br>
                 <span class="item-attributes"><strong>Symptoms: </strong></span><span class="colo"><br> {{i['ap_details']['symptoms']}}<br></span>
-                <span class="item-attributes"><strong>Description: </strong></span><span class="colo"><br> {{i['ap_details']['situation']}}</span>
+                <span class="item-attributes"><strong>Description: </strong></span><span class="colo"><br> {{i['ap_details']['situation']}}<br><br></span>
+                <div class="form-check">
+                    <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="patient" id="exampleRadios1" value="{{i['user']}}" required>
+                  Choose
+                </label>
+              </div>
             </div>
         </div>
     </div>
       {%end%}
+            <div class="form-group">
+              <label for="exampleTextarea">Example textarea</label>
+                <textarea class="form-control" id="exampleTextarea" rows="3" placeholder="Enter Your Diagnosis here" required></textarea>
+            </div>
+            <input type="submit" class="btn btn-primary">
+          </form>
         </div>
           <div id="detailss">
             <div class="rounded bg-dark item-body row">

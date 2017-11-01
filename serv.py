@@ -50,23 +50,20 @@ class patient(users):
         if user in plist:
             return False
         # resp = yield db.patient.find_one({'user': user})
-        # plist.append(user)
+        plist.append(user)
         # ap_details = resp['ap_details']
-        appointment = yield db.appointments.find_one({"user": user})
+        appointment = yield db.patient.find_one({"user": user})
         ap_details['doctor'] = duser
         ap_details['status'] = False
-        if appointment is not None:
-            ap_list = appointment[user]
+        if appointment['ap_details'] is not None:
+            ap_list = appointment['ap_details']
         else:
             ap_list = list()
         ap_list.append(ap_details)
-        if appointment is None:
-            Modi = yield db.appointments.insert_one({"user": user, user: ap_list})
-        else:
-            Modi = yield db.patient.update({'_id': appointment['_id']}, {'$set': {user: ap_details}}, upsert=False)
+        Modi = yield db.patient.update({'_id': appointment['_id']}, {'$set': {'ap_details': ap_list}}, upsert=False)
         Modi2 = yield db.doctor.update({'_id': dbdoc['_id']}, {'$set': {'plist': plist}}, upsert=False)
 
-        if Modi2['updatedExisting']:
+        if Modi2['updatedExisting'] and Modi['updatedExisting']:
             return True
         return False
 
@@ -89,15 +86,14 @@ class doctor(users):
     @coroutine
     def doc_list(db, cond, user):
         # resp = yield db.patient.find_one({'user': user})
-        appoint_det = yield db.appointments.find_one({'user': user})
-        if appoint_det is not None:
-            check_list = appoint_det[user]
+        appoint_det = yield db.patient.find_one({'user': user})
+        if appoint_det['ap_details'] != []:
+            check_list = appoint_det['ap_details']
             counter = 0
-            if len(check_list)>=3:
-                for check in check_list:
-                    if check['status'] == False:
-                        counter+=1
-            if counter>=3:
+            for check in check_list:
+                if check['status'] == False:
+                    counter+=1
+            if counter>=1:
                 return False
         # Modi = yield db.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
         # if not Modi['updatedExisting']:
@@ -277,7 +273,11 @@ class DocHandler(BaseHandler):
                 listofpat = []
                 for i in resp:
                     pat = yield database.patient.find_one({"user": i})
-                    listofpat.append(pat)
+                    for j in pat['ap_details']:
+                        if j['status'] == False:
+                            pat['ap_details'] = j
+                            listofpat.append(pat)
+
                 # self.write(json.dumps(JSONEncoder().encode(details)))
                 self.render("doctor.html", Name=username, resp=listofpat ,dat=details)
             else:
@@ -348,7 +348,7 @@ class PatientHandler(BaseHandler):
                 username = self.get_cookie("name")
                 database = self.db()
                 details = yield database.patient.find_one({"user": username})
-                self.render("patient.html", Name=username, resp=details, error=False)
+                self.render("patient.html", Name=username, resp=details, error=False, data=details['ap_details'])
             else:
                 self.redirect("/")
 
@@ -375,7 +375,7 @@ class PatientHandler(BaseHandler):
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()
-    client = motor_tornado.MotorClient("mongodb://amrut:excalibur@ds117605.mlab.com:17605/tornado")
+    client = motor_tornado.MotorClient("mongodb://souldiv:checkthisout89@ds117605.mlab.com:17605/tornado")
     settings = {
         "default_handler_class": my404handler,
         "debug": True,
