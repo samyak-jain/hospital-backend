@@ -13,7 +13,7 @@
   	<link rel="stylesheet" href="../static/css/sb-admin.css">
 	<style type="text/css">
         html{
-            overflow-y: hidden;
+            overflow-y:;
         }
 		.left-bar{
 			height: 45.5em;
@@ -59,13 +59,22 @@
  </nav>
 <form action="/appoint" method="get">
     <div class="container">
+    {% set counter = 0%}
  {% for data in response %}
+    {% if counter%2==0%}
+        <div class="row">
+    {%end%}
+<div class="col-6">
 <div class="card text-white bg-dark mb-3" style="max-width: 20rem;">
         <div class="card-header">Dr.{{data['fname']}}</div>
         <div class="card-body">
             <h4 class="card-title">{{data['fname']}} {{data['lname']}}</h4>
             <p class="card-text">
-                <img src="{{data['img']}}" style="width:160px;height:200px;"><br>
+                <div>
+                    <img class="list-image" src="{{data['img']}}">
+                </div>
+                <br>
+                <!--<img src="{{data['img']}}" style="width:160px;height:200px;"><br>-->
                 <span class="item-attributes"><strong>Contact Email: </strong></span>{{data['email']}}<br>
                 <span class="item-attributes"><strong>Qualifications: </strong></span>{{data['qualifications']}}<br>
                 <span class="item-attributes"><strong>About Dr.{{data['fname']}} </strong></span>{{data['description']}}<br>
@@ -73,6 +82,12 @@
             </p>
         </div>
     </div>
+</div>
+{% if counter%2!=0%}
+</div>
+{%end%}
+            {%set counter+=1%}
+
  {%end%}
         <input type="submit" class="btn btn-primary">
     </div>

@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
-  <title>A PAGE</title>
+  <title>doc</title>
   <!-- Bootstrap core CSS-->
   <link href="../static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <!-- Custom fonts for this template-->
@@ -28,40 +28,31 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-        <li class="nav-item">
-                <a class="nav-link" href="/"> {{Name}} <span class="sr-only">(name)</span></a>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Home">
+          <a class="nav-link" href="/">
+            <i class="fa fa-fw fa-tachometer"></i>
+            <span class="nav-link-text">{{Name}} </span>
+          </a>
             </li>
-        <!--<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">-->
-          <!--<a class="nav-link" href="/">-->
-            <!--<i class="fa fa-fw fa-dashboard"></i>-->
-            <!--<span class="nav-link-text">Home</span>-->
-          <!--</a>-->
-        <!--</li>-->
-        <!--<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">-->
-          <!--<a class="nav-link" href="charts.html">-->
-            <!--<i class="fa fa-fw fa-area-chart"></i>-->
-            <!--<span class="nav-link-text">Charts</span>-->
-          <!--</a>-->
-        <!--</li>-->
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Tables">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Hospitals">
           <a class="nav-link" href="/portal">
             <i class="fa fa-fw fa-table"></i>
             <span class="nav-link-text">Hospitals</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Tables">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="details">
           <a class="nav-link" id="detail">
             <i class="fa fa-fw fa-file"></i>
             <span class="nav-link-text">Your details</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="appointments">
           <a class="nav-link" id="appoint">
             <i class="fa fa-fw fa-wrench"></i>
             <span class="nav-link-text">Patient appointments</span>
           </a>
         </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Example Pages">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Regi">
           <!--<a class="nav-link" data-parent="#exampleAccordion">-->
             <!--<i class="fa fa-fw fa-file"></i>-->
             <!--<span class="nav-link-text">Example Pages</span>-->
@@ -231,9 +222,10 @@
       <div class="row">
         <div class="col-12">
           <div class="appointment">
+            <span style="color:black;">
           <h1>Home</h1>
           <p>Welcome Dr.{{Name}}!</p>
-
+            </span>
           {% for i in resp %}
           <div class="rounded bg-dark item-body row">
         <div class="item-image col-md-3">
@@ -296,6 +288,7 @@
       <i class="fa fa-angle-up"></i>
     </a>
     <!-- Logout Modal-->
+  <span class="bolo">
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -313,6 +306,7 @@
         </div>
       </div>
     </div>
+  </span>
     <!-- Bootstrap core JavaScript-->
     <script src="../static/vendor/jquery/jquery.min.js"></script>
     <script src="../static/vendor/popper/popper.min.js"></script>

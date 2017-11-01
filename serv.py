@@ -42,7 +42,6 @@ class users(object):
 
 
 class patient(users):
-
     @staticmethod
     @coroutine
     def make_appointment(duser, db, user):
@@ -50,15 +49,20 @@ class patient(users):
         plist = dbdoc['plist']
         if user in plist:
             return False
+        resp = yield db.patient.find_one({'user': user})
         plist.append(user)
+        ap_details = resp['ap_details']
+        ap_details['doctor'] = duser
+        ap_details['status'] = False
+        Modi = yield db.appointments.insert_one({"user": user, user: ap_details})
         Modi2 = yield db.doctor.update({'_id': dbdoc['_id']}, {'$set': {'plist': plist}}, upsert=False)
+
         if Modi2['updatedExisting']:
             return True
         return False
 
 
 class doctor(users):
-
     @staticmethod
     @coroutine
     def diagnose(db, username):
@@ -76,9 +80,12 @@ class doctor(users):
     @coroutine
     def doc_list(db, cond, user, ap_details):
         resp = yield db.patient.find_one({'user': user})
-        if resp['ap_details'] == {}:
+        appoint_det = yield db.appointments.find_one({'user': user})
+        if appoint_det is not None:
             return False
         Modi = yield db.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
+        if not Modi['updatedExisting']:
+            return False
         resp = db.doctor.find({"type": cond})
         listOfDoc = []
         while (yield resp.fetch_next):
@@ -155,7 +162,7 @@ class AuthHandler(BaseHandler):
             self.render("error.html",d=json.dumps({
                 "error": {
                     "code": "50",
-                    "message": "Credentials invalid or client failure.  "
+                    "message": "Credentials invalid or client failure. "
                 }
             }))
             return
@@ -244,8 +251,8 @@ class PatientHandler(BaseHandler):
             if portal == "1":
                 username = self.get_cookie("name")
                 database = self.db()
-                details = yield database.patient.find_one({"user":username})
-                self.render("patient.html", Name=username, resp=details)
+                details = yield database.patient.find_one({"user": username})
+                self.render("patient.html", Name=username, resp=details, error=False)
             else:
                 self.redirect("/")
 
@@ -266,8 +273,8 @@ class PatientHandler(BaseHandler):
         doctor_data = yield doctor.doc_list(self.db(), type, username, ap_details)
         if doctor_data:
             self.render("doctorlist.html", response=doctor_data, Name=username, error=False)
-        else:
-            self.render("patient.html", response=doctor_data, Name=username, error=True)
+        elif doctor_data == False:
+            self.render("patient.html", resp=doctor_data, Name=username, error=True)
         # self.write(json.dumps(doctor_data))
 
 class DocHandler(BaseHandler):
@@ -336,8 +343,13 @@ class DocListHandler(BaseHandler):
     def get(self):
         duser = self.get_argument("dname")
         user = self.get_cookie("name")
-        patient.make_appointment(duser, self.db(), user)
-        self.write("Your appointment has been made successfully.")
+        flag = yield patient.make_appointment(duser, self.db(), user)
+        if flag:
+            self.write("Your appointment has been made successfully.")
+            return
+        else:
+            self.write("Error in making appointment")
+            return
         
 
 if __name__ == "__main__":
