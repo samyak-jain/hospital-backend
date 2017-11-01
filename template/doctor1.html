@@ -13,7 +13,7 @@
   	<link rel="stylesheet" href="../static/css/sb-admin.css">
 	<style type="text/css">
         html{
-            overflow-y: hidden;
+            overflow-y: ;
         }
 		.left-bar{
 			height: 45.5em;
@@ -29,6 +29,14 @@
         .bold{
             font-weight: bold;
         }
+        .bdlo{
+            width:250px;
+        }
+        .text0{
+            color:black;
+            font-weight: bold;
+        }
+
 	</style>
 </head>
 
@@ -53,7 +61,7 @@
             <!--</li>-->
           </ul>
           <span class="navbar-text">
-              <a href="https://github.com/Souldiv">GitHub Profile</a>
+              <a href="">GitHub Profile</a>
           </span>
       </div>
  </nav>
@@ -67,57 +75,43 @@
 			 <a class="btn" id="detail" href="">Your details</a>
 	 </div>
 		<div class="container col-md-10 right-bar">
-            <div class="appointment">
-            {% for i in resp %}
-            <div class="card card-register mx-auto mt-5 bg-dark ">
-                <div class="card-header"></div>
-                    <div class="card-body">
-                        <img src="{{i['url']}}" style="width:50px;height:50px;">
-                        <br>symptoms: <br>
-                        {{i['symptoms']}}
-                        <br>description: <br>
-                        {{i['description']}}
-                    </div>
-                </div>
- 	        </div>
-            {%end%}
-        <div class="hide" id="detailss">
+            <div class="hide" id="detailss">
          <div class="card card-register mx-auto mt-5 bg-dark ">
       <div class="card-header">Your details</div>
       <div class="card-body">
-        <form class="was-validated" id="regis" method="post">
+        <div class="was-validated" id="regis" style="">
             <div class="form-group">
             <div class="form-row">
               <div class="col-md-6">
-                <img src="{{resp['img']}}" style="width:160px;height:250px;">
+                <img src="{{dat['img']}}" style="width:160px;height:250px;">
               </div>
             </div>
           </div>
           <div class="form-group">
             <div class="form-row">
               <div class="col-md-6">
-                <span class="bold">First name</span>: {{resp['fname']}}
+                <span class="bold">First name</span>: {{dat['fname']}}
               </div>
             </div>
           </div>
             <div class="form-group">
             <div class="form-row">
               <div class="col-md-6">
-                <span class="bold">Last name</span>: {{resp['lname']}}
+                <span class="bold">Last name</span>: {{dat['lname']}}
               </div>
             </div>
           </div>
             <div class="form-group">
             <div class="form-row">
               <div class="col-md-6">
-                <span class="bold">email</span>: {{resp['email']}}
+                <span class="bold">email</span>: {{dat['email']}}
               </div>
             </div>
           </div>
             <div class="form-group">
             <div class="form-row">
               <div class="col-md-6">
-                <span class="bold">Address</span>: {{resp['address']}}
+                <span class="bold">Address</span>: {{dat['address']}}
               </div>
             </div>
           </div>
@@ -125,19 +119,33 @@
             <div class="form-row">
               <div class="col-md-6">
                   <span><h5>appointments</h5></span>
-                  {% if resp['ap_details'] != {} %}
                   <br>Patients:
-                    {% for i in resp['plist']%}
-                        {{i}}
+                    {% for i in dat['plist']%}
+                        <br>{{i}}
                     {%end%}
-                  {%end%}
               </div>
             </div>
           </div>
-        </form>
+        </div>
       </div>
 	  </div>
 	 </div>
+            <div class="appointment">
+            {% for i in resp %}
+            <div class="card card-register mx-auto mt-5 bg-dark bdlo">
+                <div class="card-header">{{i['fname']}} {{i['lname']}}</div>
+                    <div class="card-body">
+                        <hr style="{height:150px;}">
+                        <img src="{{i['img']}}" style="width:160px;height:200px;">
+                        <br><span class="text0">symptoms: </span><br>
+                        {{i['ap_details']['symptoms']}}
+                        <br><span class="text0">description: </span><br>
+                        {{i['ap_details']['situation']}}
+                    </div>
+                </div>
+                {%end%}
+ 	        </div>
+
  </div>
  </div>
 
@@ -147,55 +155,12 @@
  <script src="https://cdn.jsdelivr.net/jquery.validation/1.15.1/jquery.validate.min.js"></script>
  <script>
 	  $().ready(function() {
-  // Initialize form validation on the registration form.
-  // It has the name attribute "registration"
-  $("#regis").validate({
-      errorClass: "error",
-    // Specify validation rules
-    rules: {
-      // The key name on the left side is the name attribute
-      // of an input field. Validation rules are defined
-      // on the right side
-      fname: "required",
-      lname: "required",
-      email: {
-        required: true,
-        // Specify that email should be validated
-        // by the built-in "email" rule
-        email: true
-      },
-      pass: {
-        required: true,
-        minlength: 5
-      },
-      cpass:{
-          required: true,
-          equalTo: "#exampleInputPassword1"
-      }
-    },
-    // Specify validation error messages
-    messages: {
-      fname: "Please enter your firstname.",
-      lname: "Please enter your lastname.",
-      pass: {
-        required: "Please provide a password.",
-        minlength: "Your password must be at least 5 characters long."
-      },
-      email: "Please enter a valid email address.",
-      cpass: "Passwords do not match."
-    },
-    // Make sure the form is submitted to the destination defined
-    // in the "action" attribute of the form when valid
-    submitHandler: function(form) {
-      form.submit();
-    }
-  });
-});
-	  $(function () {
-          $("#appoint").click(function(){
+        $(function () {
+          $("#appoint").click(function(e){
+              e.preventDefault();
               console.log('appoint clicked !');
               $(".appointement").show();
-			  $("#details").hide();
+			  $("#detailss").hide();
 	  });
 	 $("#detail").click(function(e){
 	     e.preventDefault();
@@ -205,6 +170,8 @@
 
         });
 	  });
+});
+
  </script>
 </body>
 

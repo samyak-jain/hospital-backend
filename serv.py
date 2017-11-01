@@ -76,6 +76,8 @@ class doctor(users):
     @coroutine
     def doc_list(db, cond, user, ap_details):
         resp = yield db.patient.find_one({'user': user})
+        if resp['ap_details'] == {}:
+            return False
         Modi = yield db.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
         resp = db.doctor.find({"type": cond})
         listOfDoc = []
@@ -261,9 +263,11 @@ class PatientHandler(BaseHandler):
             "situation": sit,
             "doctor": type
         }
-
         doctor_data = yield doctor.doc_list(self.db(), type, username, ap_details)
-        self.render("doctorlist.html", response=doctor_data, Name=username)
+        if doctor_data:
+            self.render("doctorlist.html", response=doctor_data, Name=username, error=False)
+        else:
+            self.render("patient.html", response=doctor_data, Name=username, error=True)
         # self.write(json.dumps(doctor_data))
 
 class DocHandler(BaseHandler):
@@ -274,8 +278,14 @@ class DocHandler(BaseHandler):
             if portal == "0":
                 username = self.get_cookie("name")
                 database = self.db()
-                details = yield database.patient.find_one({"user":username})
-                self.render("blank.html", Name=username, resp=details)
+                details = yield database.doctor.find_one({"user":username})
+                resp = details['plist']
+                listofpat = []
+                for i in resp:
+                    pat = yield database.patient.find_one({"user": i})
+                    listofpat.append(pat)
+                # self.write(json.dumps(JSONEncoder().encode(details)))
+                self.render("doctor.html", Name=username, resp=listofpat ,dat=details)
             else:
                 self.redirect("/")
 
@@ -327,6 +337,7 @@ class DocListHandler(BaseHandler):
         duser = self.get_argument("dname")
         user = self.get_cookie("name")
         patient.make_appointment(duser, self.db(), user)
+        self.write("Your appointment has been made successfully.")
         
 
 if __name__ == "__main__":
