@@ -71,10 +71,22 @@ class patient(users):
 class doctor(users):
     @staticmethod
     @coroutine
-    def diagnose(db, username):
-        resp = yield db.doctor.find_one({"user": username})
-        patient_resp = db.patient.find({'ap_details.type': {'$in': resp['type']}})
-        return patient_resp
+    def diagnose(db, username, docuser, response):
+        resp = yield db.patient.find_one({"user": username})
+        ap_details = resp['ap_details']
+        for i in range(len(ap_details)):
+            if ap_details[i]['status'] == False:
+                ap_details[i]['response'] = response
+                ap_details[i]['status'] = True
+                break
+        Modi = yield db.patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
+        if Modi['updatedExisting']:
+            doc = yield db.doctor.find_one({"user": docuser})
+            plist = doc["plist"]
+            plist.remove(username)
+            Modi2 = yield db.doctor.update({'_id': doc['_id']}, {'$set': {'plist': plist}}, upsert=False)
+            return Modi2['updatedExisting']
+        return False
     #
     # @classmethod
     # @coroutine
@@ -152,9 +164,9 @@ class BaseHandler(tornado.web.RequestHandler):
 class AuthHandler(BaseHandler):
     @coroutine
     def get(self):
-        type = ['cardiologist','neurologist','psychiatrist','physician']
+        carp = ['cardiologist','ent','psychiatrist', 'physician']
         listofdoc = list()
-        for i in type:
+        for i in carp:
             doc = yield self.db().doctor.find_one({"type":i})
             listofdoc.append(doc)
         if bool(self.get_secure_cookie("user")):
@@ -162,12 +174,12 @@ class AuthHandler(BaseHandler):
             username = self.get_cookie("name")
             if portal == "1":
                 patio = yield self.db().patient.find_one({'user': username})
-                self.render("index.html", tarp=1, name=patio['fname'], listofdoc=listofdoc)
+                self.render("index.html", tarp=1, name=patio['fname'], listofdoc=listofdoc, success=False)
             elif portal =="0":
                 patio = yield self.db().doctor.find_one({'user': username})
-                self.render("index.html", tarp=0, name=patio['fname'], listofdoc=listofdoc)
+                self.render("index.html", tarp=0, name=patio['fname'], listofdoc=listofdoc, success=False)
         else:
-            self.render("index.html", tarp=None, name="Amrut", listofdoc=listofdoc)
+            self.render("index.html", tarp=None, name="Amrut", listofdoc=listofdoc, success=False)
 
     @coroutine
     def post(self):
@@ -279,7 +291,7 @@ class DocHandler(BaseHandler):
                             listofpat.append(pat)
 
                 # self.write(json.dumps(JSONEncoder().encode(details)))
-                self.render("doctor.html", Name=username, resp=listofpat ,dat=details)
+                self.render("doctor.html", Name=username, resp=listofpat ,dat=details, error=False, success=False)
             else:
                 self.redirect("/")
 
@@ -288,21 +300,11 @@ class DocHandler(BaseHandler):
         response = self.get_argument("response")
         username = self.get_argument("patient")
         docuser = self.get_cookie("name")
-
-        resp = yield self.db().patient.find_one({"user": username})
-        ap_details = resp['ap_details']
-        for i in range(len(ap_details)):
-            if ap_details[i]['status'] == False:
-                ap_details[i]['response'] = response
-                break
-        Modi = yield self.db().patient.update({'_id': resp['_id']}, {'$set': {'ap_details': ap_details}}, upsert=False)
-        if Modi['updatedExisiting']:
-            doc = yield self.db().doctor.find_one({"user": docuser})
-            plist = doc["plist"]
-            plist.remove(username)
-            Modi2 = yield self.db().doctor.update({'_id': doc['_id']}, {'$set': {'plist': plist}}, upsert=False)
-            return Modi2
-        return False
+        check = yield doctor.diagnose(self.db(), username, docuser, response)
+        if not check:
+            self.render("doctor.html", Name=docuser, error=True, success=False)
+        else:
+            self.render("doctor.html", Name=docuser,success=True, error=False)
 
 
 class my404handler(BaseHandler):
@@ -353,10 +355,10 @@ class DocListHandler(BaseHandler):
         user = self.get_cookie("name")
         flag = yield patient.make_appointment(duser, self.db(), user, self.settings['ap_details'])
         if flag:
-            self.write("Your appointment has been made successfully.")
+            self.render("patient.html", Name=user, error=False, success=True)
             return
         else:
-            self.write("Error in making appointment")
+            self.render("patient.html", Name=user, error=True, success=False)
             return
 
 
@@ -369,7 +371,7 @@ class PatientHandler(BaseHandler):
                 username = self.get_cookie("name")
                 database = self.db()
                 details = yield database.patient.find_one({"user": username})
-                self.render("patient.html", Name=username, resp=details, error=False, data=details['ap_details'])
+                self.render("patient.html", Name=username, resp=details, error=False, data=details['ap_details'], success=False)
             else:
                 self.redirect("/")
 
@@ -391,7 +393,29 @@ class PatientHandler(BaseHandler):
         if doctor_data:
             self.render("doctorlist.html", response=doctor_data, Name=username, error=False)
         elif doctor_data == False:
-            self.render("patient.html", resp=doctor_data, Name=username, error=True)
+            self.render("patient.html", resp=doctor_data, Name=username, error=True, success=False)
+
+
+class betweenHandler(BaseHandler):
+    @coroutine
+    def get(self):
+        carp = ['cardiologist','neurologist','psychiatrist','physician']
+        listofdoc = list()
+        for i in carp:
+            doc = yield self.db().doctor.find_one({"type":i})
+            listofdoc.append(doc)
+        if bool(self.get_secure_cookie("user")):
+            portal = self.get_cookie("portal")
+            username = self.get_cookie("name")
+            if portal == "1":
+                patio = yield self.db().patient.find_one({'user': username})
+                self.render("index.html", tarp=1, name=patio['fname'], listofdoc=listofdoc, success=True)
+            elif portal =="0":
+                patio = yield self.db().doctor.find_one({'user': username})
+                self.render("index.html", tarp=0, name=patio['fname'], listofdoc=listofdoc, success=True)
+        else:
+            self.render("index.html", tarp=None, name="Amrut", listofdoc=listofdoc, success=True)
+
 
 
 if __name__ == "__main__":

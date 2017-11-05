@@ -242,12 +242,18 @@
         <div class="col-12">
           <h1 style="color:black;">Home</h1>
           <p style="color:black;">Welcome {{Name}}!</p>
-              {% if error %}
+            {% if success %}
+                <div class="alert alert-success" role="alert">
+                    <strong>Heads up!</strong> Your appointment has been made successfully!
+                </div>
+              {% elif error %}
               <div class="alert alert-danger" role="alert">
                 <strong>Oh snap!</strong> You have already made an appointment please wait for the doctor to respond!
               </div>
               {% else %}
+          <hr>
             <div class="appointment">
+              <h3 class="bolo">Make an appointment</h3>
           <div class="rounded bg-dark make-ones row">
             <div class="colo">
             <form class="was-validated" id="apoints" method="post">
@@ -297,6 +303,7 @@
           </div>
         </div>
           <div id="detailss">
+            <h3 class="bolo">Details</h3>
             <div class="rounded bg-dark make-twos row">
         <div class="item-image col-md-3">
         <img class="img-fluid druid" src="{{resp['img']}}">
@@ -325,7 +332,15 @@
           </div>
           {% if data != []%}
             <div class="response">
+                {% set counter = 1%}
+              {%set zero=1%}
               {% for ap in data %}
+                {% if counter==3 or zero==1%}
+              {%set zero=0%}
+              {%set counter+=1%}
+                <div class="row">
+                {%end%}
+                    <div class="col-3">
               <div class="card text-white bg-dark mb-3" style="max-width: 20rem;">
               <div class="card-header">appointment with Dr. {{ap['doctor']}}</div>
               <div class="card-body">
@@ -347,9 +362,16 @@
                 {%end%}
               </div>
               </div>
-              {%end%}
+                </div>
+            {% if counter%3==0 and counter!=0%}
+                  {%set counter-=3%}
           </div>
+        {%end%}
+
           {%end%}
+
+                </div>
+            {%end%}
             {%end%}
         </div>
       </div>

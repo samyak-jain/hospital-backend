@@ -221,6 +221,15 @@
       </ol>
       <div class="row">
         <div class="col-12">
+          {% if success %}
+                <div class="alert alert-success" role="alert">
+                    <strong>Heads up!</strong> Response is set! You have diagnosed the patient!
+                </div>
+          {% elif error %}
+              <div class="alert alert-danger" role="alert">
+                <strong>Oh snap!</strong> There was an error caused! Please Try again later!
+              </div>
+              {% else %}
           <div class="appointment">
             <span style="color:black;">
           <h1>Home</h1>
@@ -255,12 +264,14 @@
       {%end%}
             <div class="form-group">
               <label for="exampleTextarea">Example textarea</label>
-                <textarea class="form-control" id="exampleTextarea" rows="3" placeholder="Enter Your Diagnosis here" required></textarea>
+                <textarea class="form-control" id="exampleTextarea" rows="3" name="response" placeholder="Enter Your Diagnosis here" required></textarea>
             </div>
             <input type="submit" class="btn btn-primary">
           </form>
         </div>
           <div id="detailss">
+            <h3 class="bolo"> Details</h3>
+            <hr>
             <div class="rounded bg-dark item-body row">
         <div class="item-image col-md-3">
         <img class="img-fluid druid" src="{{dat['img']}}">
@@ -287,6 +298,7 @@
           </div>
 
         </div>
+        {%end%}
       </div>
     </div>
     <!-- /.container-fluid-->
@@ -294,7 +306,7 @@
     <footer class="sticky-footer">
       <div class="container">
         <div class="text-center">
-          <small>Copyright © Your Website 2017</small>
+          <small class="bolo">Copyright © Your Website 2017</small>
         </div>
       </div>
     </footer>

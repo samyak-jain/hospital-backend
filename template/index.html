@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MediCent</title>
     
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans|Raleway|Candal">
+    <!--<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans|Raleway|Candal">-->
     <link rel="stylesheet" type="text/css" href="../static/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="../static/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="../static/css/style.css">
@@ -111,7 +111,7 @@
 				<div class="col-md-4 col-sm-4">
 					<h2 class="ser-title">Our Service</h2>
 					<hr class="botm-line">
-					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris cillum.</p>
+					<p>Too lazy to get up from your bed and visit the doctor but your back is itching? Just Sign up on MediCent and get that advice on your itching back!</p>
 				</div>
 				<div class="col-md-4 col-sm-4">
 					<div class="service-info">
@@ -120,7 +120,7 @@
 						</div>
 						<div class="icon-info">
 							<h4>24 Hour Support</h4>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+							<p>Anytime Anywhere, just open the website up and make any appointments as quick as brushing your teeth!</p>
 						</div>
 					</div>
 					<div class="service-info">
@@ -129,7 +129,7 @@
 						</div>
 						<div class="icon-info">
 							<h4>Emergency Services</h4>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+							<p>In an emergency? Well our doctors are On duty 24/7 get instant help and advice from them about your situation.</p>
 						</div>
 					</div>
 				</div>
@@ -140,7 +140,7 @@
 						</div>
 						<div class="icon-info">
 							<h4>Medical Counseling</h4>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+							<p>Only the Best doctors for your Medical counseling needs!</p>
 						</div>
 					</div>
 					<div class="service-info">
@@ -149,7 +149,7 @@
 						</div>
 						<div class="icon-info">
 							<h4>Premium Healthcare</h4>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+							<p>Our premium Healthcare providing hospitals will never let you down, we do a quality check for every hospital in our database.</p>
 						</div>
 					</div>
 				</div>
@@ -169,8 +169,10 @@
 			        <div class="section-title">
 			          <h2 class="head-title lg-line">Our Team</h2>
 			          <hr class="botm-line">
-			          <p class="sec-para">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua..</p>
-			          <a href="" style="color: #0cb8b6; padding-top:10px;">Know more..</a>
+			          <p class="sec-para">A very strong and focused set of individuals who have the fire and determination for glory and the making of geniuses!
+						  Our goal is to make peoples live easier and from this project we have come one step ahead!
+					  </p>
+			          <!--<a href="" style="color: #0cb8b6; padding-top:10px;">Know more..</a>-->
 			        </div>
 			    </div>
 			    <div class="col-md-9 col-sm-8 col-xs-12">
@@ -178,15 +180,22 @@
 			          <div class="more-features-box-text">
 			            <div class="more-features-box-text-icon"> <i class="fa fa-angle-right" aria-hidden="true"></i> </div>
 			            <div class="more-features-box-text-description">
-				            <h3>Lokesh Sipani</h3>
-				            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et. Ut wisi enim ad minim veniam, quis nostrud.</p>
+				            <h3>Amrut Phadke</h3>
+				            <p>Our resident Backend developer who has made the server for our site and formulated the plot of the website!</p>
 				        </div>
 			          </div>
 			          <div class="more-features-box-text">
 			            <div class="more-features-box-text-icon"> <i class="fa fa-angle-right" aria-hidden="true"></i> </div>
 			            <div class="more-features-box-text-description">
-				            <h3>Nikhil Saboo</h3>
-				            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et. Ut wisi enim ad minim veniam, quis nostrud.</p>
+				            <h3>Prakhar Lohiya</h3>
+				            <p>The Defacto Frontend guy who made the webistes magical with his awesome Frontend-ing skills.</p>
+				        </div>
+                        </div>
+					   <div class="more-features-box-text">
+			            <div class="more-features-box-text-icon"> <i class="fa fa-angle-right" aria-hidden="true"></i> </div>
+			            <div class="more-features-box-text-description">
+				            <h3>Kaushik Reddy</h3>
+				            <p>The man in the shadows that made this thing possible by making concrete models and devised the works of the Webapp.</p>
 				        </div>
                         </div>
 			        </div>
@@ -206,8 +215,10 @@
 					<hr class="botm-line">
 				</div>
 				{% for doc in listofdoc %}
+				{% if doc is not None %}
 				<div class="col-md-3 col-sm-3 col-xs-6">
-			      <div class="thumbnail"> 
+			      <div class="thumbnail">
+
 			      	<img src="{{doc['img']}}" alt="..." class="team-img" style="width:250px;height:220px;">
 			        <div class="caption">
 			          <h3>Dr. {{doc['fname']}} {{doc['lname']}}</h3>
@@ -221,48 +232,7 @@
 			      </div>
 			    </div>
 				{%end%}
-			    <!--<div class="col-md-3 col-sm-3 col-xs-6">-->
-			      <!--<div class="thumbnail"> -->
-			      	<!--<img src="../static/img/IMG_39081.jpg" alt="..." class="team-img">-->
-			        <!--<div class="caption">-->
-			          <!--<h3>Dr. listofdoc[3][]</h3>-->
-			          <!--<p>Diabetologist</p>-->
-			          <!--<ul class="list-inline">-->
-			            <!--<li><a href="https://www.facebook.com/saiteja.ganji"><i class="fa fa-facebook"></i></a></li>-->
-			            <!--<li><a href="#"><i class="fa fa-twitter"></i></a></li>-->
-			            <!--<li><a href="#"><i class="fa fa-google-plus"></i></a></li>-->
-			          <!--</ul>-->
-			        <!--</div>-->
-			      <!--</div>-->
-			    <!--</div>-->
-			    <!--<div class="col-md-3 col-sm-3 col-xs-6">-->
-			      <!--<div class="thumbnail"> -->
-			      	<!--<img src="../static/img/IMG_39081.jpg" alt="..." class="team-img">-->
-			        <!--<div class="caption">-->
-			          <!--<h3>Dr. K Thirumal Babu</h3>-->
-			          <!--<p>Cardiologist</p>-->
-			          <!--<ul class="list-inline">-->
-			            <!--<li><a href="https://www.facebook.com/jheel4"><i class="fa fa-facebook"></i></a></li>-->
-			            <!--<li><a href="#"><i class="fa fa-twitter"></i></a></li>-->
-			            <!--<li><a href="#"><i class="fa fa-google-plus"></i></a></li>-->
-			          <!--</ul>-->
-			        <!--</div>-->
-			      <!--</div>-->
-			    <!--</div>-->
-			    <!--<div class="col-md-3 col-sm-3 col-xs-6">-->
-			      <!--<div class="thumbnail"> -->
-			      	<!--<img src="../static/img/IMG_39081.jpg" alt="..." class="team-img">-->
-			        <!--<div class="caption">-->
-			          <!--<h3>Dr. N Thyagarajan</h3>-->
-			          <!--<p>Psychiatrist</p>-->
-			          <!--<ul class="list-inline">-->
-			            <!--<li><a href="#"><i class="fa fa-facebook"></i></a></li>-->
-			            <!--<li><a href="#"><i class="fa fa-twitter"></i></a></li>-->
-			            <!--<li><a href="#"><i class="fa fa-google-plus"></i></a></li>-->
-			          <!--</ul>-->
-			        <!--</div>-->
-			      <!--</div>-->
-			    <!--</div>-->
+				{%end%}
 			</div>
 		</div>
 	</section>
@@ -308,9 +278,10 @@
 					<div class="contact-info">
 							<h3 class="cnt-ttl">Send us a message!</h3>
 							<div class="space"></div>
+							{% if success%}
                             <div id="sendmessage">Your message has been sent. Thank you!</div>
-                            <div id="errormessage"></div>
-							<form action="" method="post" role="form" class="contactForm">
+                            {%end%}
+							<form action="/message" method="get" role="form" class="contactForm">
 							    <div class="form-group">
                                     <input type="text" name="name" class="form-control br-radius-zero" id="name" placeholder="Your Name" data-rule="minlen:4" data-msg="Please enter at least 4 chars" />
                                     <div class="validation"></div>
